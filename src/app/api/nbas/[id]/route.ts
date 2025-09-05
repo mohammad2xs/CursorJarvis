@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { NBAStatus } from '@/types'
+import { NBAStatus } from '@prisma/client'
 
 export async function PATCH(
   request: NextRequest,

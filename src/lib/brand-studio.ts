@@ -138,7 +138,7 @@ export class BrandStudio {
       ],
       'Consumer/CPG': [
         'How do you currently manage creative assets across multiple product lines and seasonal campaigns?',
-        'What's your biggest challenge in keeping up with consumer trends and market demands?',
+        'What is your biggest challenge in keeping up with consumer trends and market demands?',
         'How important is it to have access to diverse, inclusive imagery for your brand?'
       ],
       'Tech/SaaS': [

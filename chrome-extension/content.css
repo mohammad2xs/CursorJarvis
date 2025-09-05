@@ -1,0 +1,200 @@
+/* CursorJarvis Content Script Styles */
+
+/* Floating Action Button */
+#cursorjarvis-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  user-select: none;
+  border: none;
+  color: white;
+}
+
+#cursorjarvis-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+}
+
+#cursorjarvis-fab:active {
+  transform: scale(0.95);
+}
+
+/* Sidebar Iframe */
+#cursorjarvis-sidebar-iframe {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  border: none;
+  z-index: 10000;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+#cursorjarvis-sidebar-iframe.visible {
+  transform: translateX(0);
+}
+
+/* Analysis Overlay */
+#cursorjarvis-analysis-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  z-index: 10001;
+  max-width: 500px;
+  width: 90%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Page Analysis Indicators */
+.cursorjarvis-highlight {
+  background: rgba(102, 126, 234, 0.2) !important;
+  border: 2px solid #667eea !important;
+  border-radius: 4px !important;
+  animation: cursorjarvis-pulse 2s infinite !important;
+}
+
+@keyframes cursorjarvis-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Notification Styles */
+.cursorjarvis-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #10b981;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 10001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  animation: cursorjarvis-slide-in 0.3s ease;
+}
+
+.cursorjarvis-notification.error {
+  background: #ef4444;
+}
+
+.cursorjarvis-notification.warning {
+  background: #f59e0b;
+}
+
+@keyframes cursorjarvis-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Account Detection Overlay */
+.cursorjarvis-account-detector {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 300px;
+}
+
+.cursorjarvis-account-detector h4 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.cursorjarvis-account-detector p {
+  margin: 0 0 12px 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.cursorjarvis-account-detector button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.cursorjarvis-account-detector button:hover {
+  background: #5a67d8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #cursorjarvis-sidebar-iframe {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  #cursorjarvis-fab {
+    bottom: 10px;
+    right: 10px;
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+  
+  #cursorjarvis-analysis-overlay {
+    width: 95%;
+    padding: 16px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  #cursorjarvis-analysis-overlay {
+    background: #1e293b;
+    color: #f1f5f9;
+  }
+  
+  .cursorjarvis-account-detector {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f1f5f9;
+  }
+  
+  .cursorjarvis-account-detector h4 {
+    color: #f1f5f9;
+  }
+  
+  .cursorjarvis-account-detector p {
+    color: #94a3b8;
+  }
+}

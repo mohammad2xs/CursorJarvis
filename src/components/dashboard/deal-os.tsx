@@ -289,7 +289,7 @@ export function DealOS({ opportunities, onUpdateOpportunity, onGeneratePlaybook 
                           </span>
                         </div>
                         <div className="mt-2">
-                          {risk.riskFactors.map((factor, i) => (
+                          {risk.riskFactors.map((factor: string, i: number) => (
                             <Badge key={i} variant="outline" className="mr-2 text-red-600 border-red-300">
                               {factor}
                             </Badge>

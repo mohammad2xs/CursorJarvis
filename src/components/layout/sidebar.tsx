@@ -14,7 +14,9 @@ import {
   Settings,
   BarChart3,
   FileText,
-  Zap
+  Zap,
+  Camera,
+  Brain
 } from 'lucide-react'
 
 const navigation = [
@@ -23,6 +25,8 @@ const navigation = [
   { name: 'Meeting OS', href: '/meetings', icon: Calendar },
   { name: 'Deal OS', href: '/deals', icon: Target },
   { name: 'Brand Studio', href: '/brand', icon: Building },
+  { name: 'Getty Accounts', href: '/getty-accounts', icon: Camera },
+  { name: 'Enhanced Jarvis', href: '/enhanced-jarvis', icon: Brain },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Reports', href: '/reports', icon: FileText },
   { name: 'Settings', href: '/settings', icon: Settings },

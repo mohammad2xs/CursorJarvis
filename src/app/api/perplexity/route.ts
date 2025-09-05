@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       case 'pre-meeting-brief':
         const briefIndustry = searchParams.get('subIndustry') || 'Tech/SaaS'
         const contactTitle = searchParams.get('contactTitle')
-        response = await perplexityService.getPreMeetingBrief('Company Name', briefIndustry, contactTitle)
+        response = await perplexityService.getPreMeetingBrief('Company Name', briefIndustry, contactTitle || undefined)
         break
       case 'proof-points':
         const proofIndustry = searchParams.get('subIndustry') || 'Tech/SaaS'

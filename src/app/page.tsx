@@ -54,6 +54,7 @@ export default function HomePage() {
         priority: 3,
         companyId: 'comp_3',
         contactId: 'contact_3',
+        opportunityId: null,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -68,6 +69,7 @@ export default function HomePage() {
         priority: 4,
         companyId: 'comp_4',
         contactId: 'contact_4',
+        opportunityId: null,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -81,6 +83,8 @@ export default function HomePage() {
         status: 'PENDING',
         priority: 3,
         companyId: 'comp_4',
+        contactId: null,
+        opportunityId: null,
         createdAt: new Date(),
         updatedAt: new Date()
       }

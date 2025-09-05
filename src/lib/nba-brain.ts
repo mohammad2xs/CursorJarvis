@@ -1,8 +1,28 @@
 import { db } from './db'
 import { NBA, NBAContext, NBAScore, PlayType, NBAStatus, Company, Contact, Opportunity, AccountSignal, Activity } from '@/types'
 import { calculateDaysSince } from './utils'
+import { autoSubagentOrchestrator } from './auto-subagents'
 
 export class NBABrain {
+  private createNBA(partialNBA: Partial<NBA>): NBA {
+    return {
+      id: `nba-${Date.now()}-${Math.random()}`,
+      playType: partialNBA.playType || 'NEW_LEAD',
+      title: partialNBA.title || '',
+      description: partialNBA.description || '',
+      rationale: partialNBA.rationale || '',
+      source: partialNBA.source || '',
+      status: partialNBA.status || 'PENDING',
+      priority: partialNBA.priority || 1,
+      companyId: partialNBA.companyId || '',
+      contactId: partialNBA.contactId || null,
+      opportunityId: partialNBA.opportunityId || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...partialNBA
+    }
+  }
+
   async generateNBAs(companyId: string): Promise<NBA[]> {
     const context = await this.getNBAContext(companyId)
     const nbas: NBA[] = []
@@ -16,6 +36,9 @@ export class NBABrain {
     nbas.push(...await this.generateEngagementDetectedNBAs(context))
     nbas.push(...await this.generatePerplexityNewsNBAs(context))
     nbas.push(...await this.generatePerplexityHireNBAs(context))
+
+    // Auto-generate subagent insights
+    await this.generateAutoSubagentInsights(context)
 
     // Score and prioritize NBAs
     const scoredNBAs = await this.scoreNBAs(nbas, context)
@@ -61,8 +84,8 @@ export class NBABrain {
     }
   }
 
-  private async generatePreMeetingNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generatePreMeetingNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for upcoming meetings
     const upcomingMeetings = await db.meeting.findMany({
@@ -78,7 +101,7 @@ export class NBABrain {
     })
 
     for (const meeting of upcomingMeetings) {
-      nbas.push({
+      nbas.push(this.createNBA({
         playType: 'PRE_MEETING',
         title: `Pre-meeting prep for ${meeting.title}`,
         description: `Prepare agenda, discovery questions, and relevant case study for ${meeting.contact?.firstName || 'contact'}`,
@@ -88,14 +111,14 @@ export class NBABrain {
         companyId: context.company.id,
         contactId: meeting.contactId,
         opportunityId: meeting.opportunityId
-      })
+      }))
     }
 
     return nbas
   }
 
-  private async generatePostMeetingNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generatePostMeetingNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for recent meetings that need follow-up
     const recentMeetings = await db.meeting.findMany({
@@ -110,7 +133,7 @@ export class NBABrain {
     })
 
     for (const meeting of recentMeetings) {
-      nbas.push({
+      nbas.push(this.createNBA({
         playType: 'POST_MEETING',
         title: `Follow up on ${meeting.title}`,
         description: `Send recap, next steps, and relevant assets to ${meeting.contact?.firstName || 'contact'}`,
@@ -120,14 +143,14 @@ export class NBABrain {
         companyId: context.company.id,
         contactId: meeting.contactId,
         opportunityId: meeting.opportunityId
-      })
+      }))
     }
 
     return nbas
   }
 
-  private async generateNewLeadNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generateNewLeadNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for new contacts without recent activities
     const newContacts = await db.contact.findMany({
@@ -148,7 +171,7 @@ export class NBABrain {
 
     for (const contact of newContacts) {
       if (contact.activities.length === 0) {
-        nbas.push({
+        nbas.push(this.createNBA({
           playType: 'NEW_LEAD',
           title: `Connect with ${contact.firstName} ${contact.lastName}`,
           description: `Send LinkedIn connection request and comment on recent activity`,
@@ -157,15 +180,15 @@ export class NBABrain {
           priority: 3,
           companyId: context.company.id,
           contactId: contact.id
-        })
+        }))
       }
     }
 
     return nbas
   }
 
-  private async generateVPCMONoTouchNBAs(context: NBAContext): Promise<Partial<NBA>[] {
-    const nbas: Partial<NBA>[] = []
+  private async generateVPCMONoTouchNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for VP/CMO contacts with no recent touch
     const vpCmoContacts = await db.contact.findMany({
@@ -188,7 +211,7 @@ export class NBABrain {
 
     for (const contact of vpCmoContacts) {
       if (contact.activities.length === 0) {
-        nbas.push({
+        nbas.push(this.createNBA({
           playType: 'VP_CMO_NO_TOUCH',
           title: `Executive outreach to ${contact.firstName} ${contact.lastName}`,
           description: `Share executive POV aligned to ${context.company.subIndustry} pillar`,
@@ -197,15 +220,15 @@ export class NBABrain {
           priority: 4,
           companyId: context.company.id,
           contactId: contact.id
-        })
+        }))
       }
     }
 
     return nbas
   }
 
-  private async generateOppIdleNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generateOppIdleNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for idle opportunities
     const idleOpportunities = await db.opportunity.findMany({
@@ -221,7 +244,7 @@ export class NBABrain {
     })
 
     for (const opportunity of idleOpportunities) {
-      nbas.push({
+      nbas.push(this.createNBA({
         playType: 'OPP_IDLE',
         title: `Re-engage ${opportunity.name}`,
         description: `Schedule 20-min hypothesis call with 3-slide outline`,
@@ -230,14 +253,14 @@ export class NBABrain {
         priority: 3,
         companyId: context.company.id,
         opportunityId: opportunity.id
-      })
+      }))
     }
 
     return nbas
   }
 
-  private async generateEngagementDetectedNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generateEngagementDetectedNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for recent engagement signals
     const engagementSignals = context.recentSignals.filter(signal => 
@@ -248,7 +271,7 @@ export class NBABrain {
     )
 
     for (const signal of engagementSignals) {
-      nbas.push({
+      nbas.push(this.createNBA({
         playType: 'ENGAGEMENT_DETECTED',
         title: `Follow up on engagement: ${signal.title}`,
         description: `Send tailored DM with benefit + micro-ask within 48h`,
@@ -256,14 +279,14 @@ export class NBABrain {
         source: `Signal ID: ${signal.id}`,
         priority: 4,
         companyId: context.company.id
-      })
+      }))
     }
 
     return nbas
   }
 
-  private async generatePerplexityNewsNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generatePerplexityNewsNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for recent news signals
     const newsSignals = context.recentSignals.filter(signal => 
@@ -274,7 +297,7 @@ export class NBABrain {
 
     for (const signal of newsSignals) {
       if (context.company.subIndustry === 'Oil & Gas/Energy' && signal.tags.includes('esg')) {
-        nbas.push({
+        nbas.push(this.createNBA({
           playType: 'PERPLEXITY_NEWS',
           title: `ESG opportunity: ${signal.title}`,
           description: `Share sustainability POV + case study`,
@@ -282,15 +305,15 @@ export class NBABrain {
           source: `Signal ID: ${signal.id}`,
           priority: 3,
           companyId: context.company.id
-        })
+        }))
       }
     }
 
     return nbas
   }
 
-  private async generatePerplexityHireNBAs(context: NBAContext): Promise<Partial<NBA>[]> {
-    const nbas: Partial<NBA>[] = []
+  private async generatePerplexityHireNBAs(context: NBAContext): Promise<NBA[]> {
+    const nbas: NBA[] = []
     
     // Check for hiring signals
     const hireSignals = context.recentSignals.filter(signal => 
@@ -300,7 +323,7 @@ export class NBABrain {
     )
 
     for (const signal of hireSignals) {
-      nbas.push({
+      nbas.push(this.createNBA({
         playType: 'PERPLEXITY_HIRE',
         title: `New leader congrats: ${signal.title}`,
         description: `Send warm congratulations + 20-min discovery ask`,
@@ -308,7 +331,7 @@ export class NBABrain {
         source: `Signal ID: ${signal.id}`,
         priority: 3,
         companyId: context.company.id
-      })
+      }))
     }
 
     return nbas
@@ -390,6 +413,9 @@ export class NBABrain {
   }
 
   async updateNBAStatus(nbaId: string, status: NBAStatus, outcome?: string): Promise<NBA> {
+    const nba = await db.nBA.findUnique({ where: { id: nbaId } })
+    if (!nba) throw new Error('NBA not found')
+    
     return db.nBA.update({
       where: { id: nbaId },
       data: {
@@ -410,6 +436,40 @@ export class NBABrain {
         opportunity: true
       }
     })
+  }
+
+  private async generateAutoSubagentInsights(context: NBAContext): Promise<void> {
+    try {
+      const autoResults = await autoSubagentOrchestrator.processCompanyContext({
+        company: context.company,
+        contact: context.contact || undefined,
+        opportunity: context.opportunity || undefined,
+        recentSignals: context.recentSignals,
+        recentActivities: context.recentActivities
+      })
+
+      // Store auto-generated insights as account signals
+      for (const result of autoResults) {
+        await db.accountSignal.create({
+          data: {
+            title: `Auto-Subagent: ${result.trigger}`,
+            summary: result.result.substring(0, 500),
+            source: 'auto_subagent',
+            url: '',
+            detectedAt: new Date(),
+            tags: [result.trigger.toLowerCase(), 'auto_generated'],
+            provenance: JSON.stringify({
+              agent: result.agent,
+              task: result.task,
+              priority: result.priority
+            }),
+            companyId: context.company.id
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Auto-subagent insights generation failed:', error)
+    }
   }
 }
 

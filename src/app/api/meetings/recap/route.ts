@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { perplexityService } from '@/lib/perplexity'
+import { TaskType } from '@prisma/client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,7 +103,7 @@ ${aiRecap.answer}
       {
         title: `Follow up with ${meeting.contact?.firstName} ${meeting.contact?.lastName}`,
         description: 'Send meeting recap and next steps',
-        type: 'EMAIL',
+        type: TaskType.EMAIL,
         dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         companyId: meeting.companyId,
         contactId: meeting.contactId,

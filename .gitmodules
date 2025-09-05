@@ -1,0 +1,3 @@
+[submodule "external/Subagents-collection"]
+	path = external/Subagents-collection
+	url = https://github.com/mohammad2xs/Subagents-collection.git

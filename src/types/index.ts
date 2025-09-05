@@ -1,4 +1,4 @@
-export type {
+import type {
   Company,
   Contact,
   Opportunity,
@@ -22,6 +22,31 @@ export type {
   PlayType,
   NBAStatus,
 } from '@prisma/client'
+
+export {
+  Company,
+  Contact,
+  Opportunity,
+  Activity,
+  Task,
+  Meeting,
+  Note,
+  AccountSignal,
+  NBA,
+  PerplexityCache,
+  GoldenPlay,
+  PriorityLevel,
+  DealType,
+  OpportunityStage,
+  ActivityType,
+  TaskType,
+  TaskStatus,
+  MeetingType,
+  MeetingStatus,
+  NoteType,
+  PlayType,
+  NBAStatus,
+}
 
 export interface CompanyWithRelations extends Company {
   contacts: Contact[]

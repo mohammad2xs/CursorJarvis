@@ -26,6 +26,11 @@ model Company {
   opportunities     Opportunity[]
   accountSignals    AccountSignal[]
   activities        Activity[]
+  tasks             Task[]
+  meetings          Meeting[]
+  notes             Note[]
+  nbas              NBA[]
+  revenueAttribution RevenueAttribution[]
   
   @@map("companies")
 }
@@ -48,6 +53,9 @@ model Contact {
   activities        Activity[]
   meetings          Meeting[]
   tasks             Task[]
+  notes             Note[]
+  nbas              NBA[]
+  revenueAttribution RevenueAttribution[]
   
   @@map("contacts")
 }
@@ -69,6 +77,9 @@ model Opportunity {
   activities        Activity[]
   meetings          Meeting[]
   tasks             Task[]
+  notes             Note[]
+  nbas              NBA[]
+  revenueAttribution RevenueAttribution[]
   
   @@map("opportunities")
 }
@@ -136,6 +147,7 @@ model Meeting {
   company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
   opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  meetingNotes      Note[] @relation("MeetingNotes")
   
   @@map("meetings")
 }
@@ -155,7 +167,7 @@ model Note {
   company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
   opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
-  meeting           Meeting? @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  meeting           Meeting? @relation("MeetingNotes", fields: [meetingId], references: [id], onDelete: SetNull)
   
   @@map("notes")
 }
@@ -223,7 +235,32 @@ model GoldenPlay {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   
+  @@unique([playType, segment])
   @@map("golden_plays")
+}
+
+model RevenueAttribution {
+  id                String   @id @default(cuid())
+  accountId         String
+  contactId         String?
+  opportunityId     String?
+  revenue           Float
+  attributionSource String   // 'direct_sale', 'incidental_purchase', 'renewal', 'expansion'
+  attributionReason String?
+  conversationId    String?
+  callId            String?
+  gettyImagesProduct String
+  department        String
+  useCase           String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  account           Company  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  
+  @@map("revenue_attribution")
 }
 
 // Enums

@@ -221,7 +221,7 @@ export function MyWork({ nbas, onUpdateNBA }: MyWorkProps) {
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                         <span className="text-blue-600 font-medium">
-                          {account.name.split(' ').map(n => n[0]).join('')}
+                          {account.name.split(' ').map((n: string) => n[0]).join('')}
                         </span>
                       </div>
                       <div>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CursorJarvis Sidebar</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div id="cursorjarvis-sidebar" class="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">🧠</div>
+        <div class="logo-text">
+          <h2>CursorJarvis</h2>
+          <p>Getty Images Sales AI</p>
+        </div>
+      </div>
+      <button class="close-btn" id="closeSidebar">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="sidebar-tabs">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="insights">Insights</button>
+      <button class="tab-btn" data-tab="calls">Calls</button>
+      <button class="tab-btn" data-tab="revenue">Revenue</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="sidebar-content">
+      <!-- Dashboard Tab -->
+      <div class="tab-content active" id="dashboard-tab">
+        <div class="account-overview">
+          <h3>Account Overview</h3>
+          <div class="account-card">
+            <div class="account-info">
+              <div class="account-name" id="accountName">Boeing</div>
+              <div class="account-tier tier-1">Tier 1</div>
+            </div>
+            <div class="account-metrics">
+              <div class="metric">
+                <div class="metric-value" id="currentRevenue">$150K</div>
+                <div class="metric-label">Revenue</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" id="growthRate">+15%</div>
+                <div class="metric-label">Growth</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h3>Quick Actions</h3>
+          <div class="action-grid">
+            <button class="action-card" id="analyzePage">
+              <div class="action-icon">🔍</div>
+              <div class="action-text">Analyze Page</div>
+            </button>
+            <button class="action-card" id="recordCall">
+              <div class="action-icon">🎙️</div>
+              <div class="action-text">Record Call</div>
+            </button>
+            <button class="action-card" id="generateInsights">
+              <div class="action-icon">💡</div>
+              <div class="action-text">Generate Insights</div>
+            </button>
+            <button class="action-card" id="viewStrategy">
+              <div class="action-icon">📊</div>
+              <div class="action-text">View Strategy</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="recent-activity">
+          <h3>Recent Activity</h3>
+          <div class="activity-list" id="activityList">
+            <div class="activity-item">
+              <div class="activity-icon">📞</div>
+              <div class="activity-content">
+                <div class="activity-title">Call with Marketing Director</div>
+                <div class="activity-time">2 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">💡</div>
+              <div class="activity-content">
+                <div class="activity-title">New revenue opportunity identified</div>
+                <div class="activity-time">4 hours ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights Tab -->
+      <div class="tab-content" id="insights-tab">
+        <div class="insights-header">
+          <h3>AI Insights</h3>
+          <button class="refresh-btn" id="refreshInsights">🔄</button>
+        </div>
+        <div class="insights-list" id="insightsList">
+          <div class="insight-card high-priority">
+            <div class="insight-header">
+              <div class="insight-icon">💰</div>
+              <div class="insight-title">Revenue Opportunity</div>
+              <div class="insight-priority">High</div>
+            </div>
+            <div class="insight-content">
+              Marketing department shows interest in premium visual content solutions
+            </div>
+            <div class="insight-actions">
+              <button class="action-btn primary">Take Action</button>
+              <button class="action-btn secondary">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calls Tab -->
+      <div class="tab-content" id="calls-tab">
+        <div class="calls-header">
+          <h3>Call Intelligence</h3>
+          <button class="record-btn" id="startRecording">🎙️ Record</button>
+        </div>
+        <div class="call-status" id="callStatus">
+          <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Ready to record</span>
+          </div>
+        </div>
+        <div class="call-analysis" id="callAnalysis">
+          <div class="analysis-metrics">
+            <div class="metric">
+              <div class="metric-label">Sentiment</div>
+              <div class="metric-value positive">8.5/10</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Engagement</div>
+              <div class="metric-value high">High</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Revenue Potential</div>
+              <div class="metric-value">$50K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Tab -->
+      <div class="tab-content" id="revenue-tab">
+        <div class="revenue-header">
+          <h3>Revenue Intelligence</h3>
+        </div>
+        <div class="revenue-overview">
+          <div class="revenue-card">
+            <div class="revenue-title">Current Revenue</div>
+            <div class="revenue-amount">$150,000</div>
+            <div class="revenue-growth">+15% from last month</div>
+          </div>
+          <div class="revenue-chart">
+            <div class="chart-placeholder">
+              📈 Revenue Trend Chart
+            </div>
+          </div>
+        </div>
+        <div class="revenue-opportunities">
+          <h4>Revenue Opportunities</h4>
+          <div class="opportunity-list">
+            <div class="opportunity-item">
+              <div class="opportunity-title">Marketing Department Expansion</div>
+              <div class="opportunity-value">+$50K potential</div>
+            </div>
+            <div class="opportunity-item">
+              <div class="opportunity-title">ESG Content Package</div>
+              <div class="opportunity-value">+$25K potential</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <div class="footer-actions">
+        <button class="footer-btn" id="openFullDashboard">Open Full Dashboard</button>
+        <button class="footer-btn" id="settings">Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>

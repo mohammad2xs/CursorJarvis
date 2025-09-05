@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "CursorJarvis - Getty Images Sales AI",
+  "version": "1.0.0",
+  "description": "AI-powered strategic account management for Getty Images sales executives",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "scripting",
+    "background",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://perplexity.ai/*",
+    "https://comet.perplexity.ai/*",
+    "http://localhost:3000/*",
+    "https://your-cursorjarvis-domain.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://perplexity.ai/*",
+        "https://comet.perplexity.ai/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "CursorJarvis",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "sidebar.html",
+        "assets/*",
+        "icons/*"
+      ],
+      "matches": [
+        "https://perplexity.ai/*",
+        "https://comet.perplexity.ai/*"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
