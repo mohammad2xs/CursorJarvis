@@ -1,0 +1,322 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id                String   @id @default(cuid())
+  name              String
+  website           String?
+  subIndustry      String   // Aerospace & Defense, Oil & Gas/Energy, Healthcare/MedSys, Consumer/CPG, Tech/SaaS
+  region            String
+  tags              String[] // priority_initiatives: ESG, Safety, Workforce/DEI, Innovation/Speed, Cost-out
+  priorityLevel     PriorityLevel @default(GROWTH)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  contacts          Contact[]
+  opportunities     Opportunity[]
+  accountSignals    AccountSignal[]
+  activities        Activity[]
+  
+  @@map("companies")
+}
+
+model Contact {
+  id                String   @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String?
+  phone             String?
+  title             String?
+  role              String?  // VP, CMO, etc.
+  linkedinUrl       String?
+  companyId         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  activities        Activity[]
+  meetings          Meeting[]
+  tasks             Task[]
+  
+  @@map("contacts")
+}
+
+model Opportunity {
+  id                String   @id @default(cuid())
+  name              String
+  dealType          DealType
+  stage             OpportunityStage @default(DISCOVER)
+  value             Float?
+  probability       Int?     // 0-100
+  closeDate         DateTime?
+  companyId         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  activities        Activity[]
+  meetings          Meeting[]
+  tasks             Task[]
+  
+  @@map("opportunities")
+}
+
+model Activity {
+  id                String   @id @default(cuid())
+  type              ActivityType
+  title             String
+  description       String?
+  outcome           String?
+  companyId         String
+  contactId         String?
+  opportunityId     String?
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  
+  @@map("activities")
+}
+
+model Task {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              TaskType
+  status            TaskStatus @default(PENDING)
+  dueDate           DateTime?
+  completedAt       DateTime?
+  companyId         String
+  contactId         String?
+  opportunityId     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  
+  @@map("tasks")
+}
+
+model Meeting {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              MeetingType
+  status            MeetingStatus @default(SCHEDULED)
+  scheduledAt       DateTime
+  duration          Int?     // minutes
+  meetingUrl        String?
+  notes             String?
+  outcome           String?
+  companyId         String
+  contactId         String?
+  opportunityId     String?
+  calendlyEventId   String?  // For Calendly integration
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  
+  @@map("meetings")
+}
+
+model Note {
+  id                String   @id @default(cuid())
+  content           String
+  type              NoteType @default(GENERAL)
+  companyId         String
+  contactId         String?
+  opportunityId     String?
+  meetingId         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  meeting           Meeting? @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  
+  @@map("notes")
+}
+
+model AccountSignal {
+  id                String   @id @default(cuid())
+  title             String
+  summary           String
+  source            String   // perplexity, sales_navigator, phantom_buster, manual
+  url               String?
+  detectedAt        DateTime
+  tags              String[]
+  provenance        String?  // Raw data for audit
+  companyId         String
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@map("account_signals")
+}
+
+model NBA {
+  id                String   @id @default(cuid())
+  playType          PlayType
+  title             String
+  description       String
+  rationale         String   // Why this NBA was suggested
+  source            String   // Rule match, source links
+  status            NBAStatus @default(PENDING)
+  priority          Int      // 1-5, higher is more important
+  companyId         String
+  contactId         String?
+  opportunityId     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact           Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity       Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  
+  @@map("nbas")
+}
+
+model PerplexityCache {
+  id                String   @id @default(cuid())
+  query             String
+  response          String
+  companyId         String?
+  ttl               DateTime
+  createdAt         DateTime @default(now())
+  
+  @@map("perplexity_cache")
+}
+
+model GoldenPlay {
+  id                String   @id @default(cuid())
+  playType          PlayType
+  segment           String   // sub_industry or role
+  acceptanceRate    Float
+  replyRate         Float
+  meetingRate       Float
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("golden_plays")
+}
+
+// Enums
+enum PriorityLevel {
+  STRATEGIC
+  GROWTH
+  NURTURE
+}
+
+enum DealType {
+  NEW_LOGO
+  RENEWAL
+  UPSELL
+  STRATEGIC
+}
+
+enum OpportunityStage {
+  DISCOVER
+  EVALUATE
+  PROPOSE
+  NEGOTIATE
+  CLOSE_WON
+  CLOSE_LOST
+}
+
+enum ActivityType {
+  CALL
+  EMAIL
+  MEETING
+  DEMO
+  PROPOSAL
+  FOLLOW_UP
+  RESEARCH
+  OUTREACH
+}
+
+enum TaskType {
+  CALL
+  EMAIL
+  MEETING_PREP
+  FOLLOW_UP
+  RESEARCH
+  PROPOSAL
+  NEGOTIATION
+  CLOSE
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum MeetingType {
+  DISCOVERY
+  DEMO
+  PROPOSAL
+  NEGOTIATION
+  FOLLOW_UP
+  INTERNAL
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum NoteType {
+  GENERAL
+  MEETING_NOTES
+  CALL_NOTES
+  RESEARCH
+  STRATEGY
+}
+
+enum PlayType {
+  PRE_MEETING
+  POST_MEETING
+  NEW_LEAD
+  VP_CMO_NO_TOUCH
+  OPP_IDLE
+  ENGAGEMENT_DETECTED
+  PERPLEXITY_NEWS
+  PERPLEXITY_HIRE
+}
+
+enum NBAStatus {
+  PENDING
+  APPROVED
+  SNOOZED
+  DECLINED
+  COMPLETED
+}
