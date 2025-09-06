@@ -303,52 +303,69 @@ export function SalesIntelligencePro({
   }, [selectedFolder, folders, searchQuery])
 
   return (
-    <div className="h-screen bg-gray-900 flex">
+    <div className="h-screen bg-black flex">
       {/* Left Sidebar - Project Folders */}
-      <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
-        <div className="p-4 border-b border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Sales Intelligence Pro</h2>
-            <Button size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+      <div className="w-80 bg-gray-950 border-r border-gray-800 flex flex-col">
+        <div className="p-6 border-b border-gray-800">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white">Sales Intelligence Pro</h2>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600 transition-all duration-200"
+              onClick={() => {
+                // Add new project folder functionality
+                const newFolder = {
+                  id: `folder-${Date.now()}`,
+                  name: 'New Project',
+                  type: 'account' as const,
+                  color: 'blue',
+                  items: [],
+                  createdAt: new Date(),
+                  updatedAt: new Date()
+                }
+                setFolders(prev => [...prev, newFolder])
+              }}
+            >
               <Plus className="w-4 h-4" />
             </Button>
           </div>
           
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
             <Input
               placeholder="Search projects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+              className="pl-10 bg-gray-900 border-gray-800 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {folders.map((folder) => (
             <div
               key={folder.id}
-              className={`p-3 rounded-lg cursor-pointer transition-colors ${
+              className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
                 selectedFolder === folder.id
-                  ? 'bg-blue-900 border-blue-600 border'
-                  : 'hover:bg-gray-700'
+                  ? 'bg-blue-950 border-2 border-blue-500 shadow-lg shadow-blue-500/20'
+                  : 'hover:bg-gray-900 border border-gray-800 hover:border-gray-700'
               }`}
               onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-4">
                   {selectedFolder === folder.id ? (
-                    <FolderOpen className={`w-5 h-5 text-${folder.color}-400`} />
+                    <FolderOpen className={`w-6 h-6 text-${folder.color}-400`} />
                   ) : (
-                    <Folder className={`w-5 h-5 text-${folder.color}-400`} />
+                    <Folder className={`w-6 h-6 text-${folder.color}-400`} />
                   )}
                   <div>
-                    <p className="font-medium text-white">{folder.name}</p>
+                    <p className="font-semibold text-white text-base">{folder.name}</p>
                     <p className="text-sm text-gray-400">{folder.items.length} items</p>
                   </div>
                 </div>
-                <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${
+                <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
                   selectedFolder === folder.id ? 'rotate-90' : ''
                 }`} />
               </div>
@@ -357,30 +374,51 @@ export function SalesIntelligencePro({
         </div>
 
         {/* Recording Controls */}
-        <div className="p-4 border-t border-gray-700">
-          <div className="space-y-3">
+        <div className="p-6 border-t border-gray-800">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-300">Call Recording</span>
-              <Badge variant={recording.isRecording ? "destructive" : "secondary"} className="bg-gray-700 text-gray-300">
+              <span className="text-sm font-semibold text-gray-200">Call Recording</span>
+              <Badge 
+                variant={recording.isRecording ? "destructive" : "secondary"} 
+                className={`${
+                  recording.isRecording 
+                    ? 'bg-red-900 text-red-300 border-red-700' 
+                    : 'bg-gray-800 text-gray-300 border-gray-700'
+                }`}
+              >
                 {recording.isRecording ? 'Recording' : 'Ready'}
               </Badge>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               {!recording.isRecording ? (
-                <Button onClick={startRecording} size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                <Button 
+                  onClick={startRecording} 
+                  size="sm" 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25"
+                >
                   <Mic className="w-4 h-4 mr-2" />
                   Start Recording
                 </Button>
               ) : (
                 <>
-                  <Button onClick={pauseRecording} size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+                  <Button 
+                    onClick={pauseRecording} 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600 transition-all duration-200"
+                  >
                     {recording.isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
                   </Button>
-                  <Button onClick={stopRecording} size="sm" variant="destructive" className="bg-red-600 hover:bg-red-700">
+                  <Button 
+                    onClick={stopRecording} 
+                    size="sm" 
+                    variant="destructive" 
+                    className="bg-red-600 hover:bg-red-700 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/25"
+                  >
                     <Square className="w-4 h-4" />
                   </Button>
-                  <span className="text-sm text-gray-400 ml-2">
+                  <span className="text-sm text-gray-400 ml-2 font-mono">
                     {formatDuration(recording.duration)}
                   </span>
                 </>
@@ -393,94 +431,112 @@ export function SalesIntelligencePro({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Navigation */}
-        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+        <div className="bg-gray-950 border-b border-gray-800 px-8 py-6">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-6 bg-gray-700">
-              <TabsTrigger value="dashboard" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
+            <TabsList className="grid w-full grid-cols-6 bg-gray-900 border border-gray-800 rounded-xl p-1">
+              <TabsTrigger 
+                value="dashboard" 
+                className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-lg"
+              >
                 <BarChart3 className="w-4 h-4" />
-                <span>Dashboard</span>
+                <span className="font-medium">Dashboard</span>
               </TabsTrigger>
-              <TabsTrigger value="nba-brain" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
+              <TabsTrigger 
+                value="nba-brain" 
+                className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-lg"
+              >
                 <Brain className="w-4 h-4" />
-                <span>NBA Brain</span>
+                <span className="font-medium">NBA Brain</span>
               </TabsTrigger>
-              <TabsTrigger value="meetings" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
+              <TabsTrigger 
+                value="meetings" 
+                className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-lg"
+              >
                 <Calendar className="w-4 h-4" />
-                <span>Meetings</span>
+                <span className="font-medium">Meetings</span>
               </TabsTrigger>
-              <TabsTrigger value="deals" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
+              <TabsTrigger 
+                value="deals" 
+                className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-lg"
+              >
                 <Target className="w-4 h-4" />
-                <span>Deals</span>
+                <span className="font-medium">Deals</span>
               </TabsTrigger>
-              <TabsTrigger value="brand" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
+              <TabsTrigger 
+                value="brand" 
+                className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-lg"
+              >
                 <Sparkles className="w-4 h-4" />
-                <span>Brand Studio</span>
+                <span className="font-medium">Brand Studio</span>
               </TabsTrigger>
-              <TabsTrigger value="chat" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
+              <TabsTrigger 
+                value="chat" 
+                className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-lg"
+              >
                 <MessageSquare className="w-4 h-4" />
-                <span>AI Chat</span>
+                <span className="font-medium">AI Chat</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-900">
+        <div className="flex-1 overflow-y-auto p-8 bg-black">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* Dashboard Tab */}
-            <TabsContent value="dashboard" className="space-y-6">
+            <TabsContent value="dashboard" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-gray-800 border-gray-700">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-white">Active Deals</CardTitle>
-                    <Target className="h-4 w-4 text-gray-400" />
+                <Card className="bg-gray-950 border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-sm font-semibold text-white">Active Deals</CardTitle>
+                    <Target className="h-5 w-5 text-blue-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-white">{opportunities.length}</div>
-                    <p className="text-xs text-gray-400">
+                    <div className="text-3xl font-bold text-white mb-1">{opportunities.length}</div>
+                    <p className="text-sm text-green-400 font-medium">
                       +12% from last month
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-gray-800 border-gray-700">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-white">Pipeline Value</CardTitle>
-                    <DollarSign className="h-4 w-4 text-gray-400" />
+                <Card className="bg-gray-950 border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-sm font-semibold text-white">Pipeline Value</CardTitle>
+                    <DollarSign className="h-5 w-5 text-green-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-3xl font-bold text-white mb-1">
                       ${opportunities.reduce((sum, opp) => sum + (opp.amount || 0), 0).toLocaleString()}
                     </div>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-green-400 font-medium">
                       +8% from last month
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-gray-800 border-gray-700">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-white">Upcoming Meetings</CardTitle>
-                    <Calendar className="h-4 w-4 text-gray-400" />
+                <Card className="bg-gray-950 border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-sm font-semibold text-white">Upcoming Meetings</CardTitle>
+                    <Calendar className="h-5 w-5 text-purple-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-white">{meetings.length}</div>
-                    <p className="text-xs text-gray-400">
+                    <div className="text-3xl font-bold text-white mb-1">{meetings.length}</div>
+                    <p className="text-sm text-purple-400 font-medium">
                       Next 7 days
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-gray-800 border-gray-700">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-white">NBA Score</CardTitle>
-                    <Brain className="h-4 w-4 text-gray-400" />
+                <Card className="bg-gray-950 border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardTitle className="text-sm font-semibold text-white">NBA Score</CardTitle>
+                    <Brain className="h-5 w-5 text-orange-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-3xl font-bold text-white mb-1">
                       {nbas.length > 0 ? Math.round(nbas.reduce((sum, nba) => sum + nba.priority, 0) / nbas.length) : 0}
                     </div>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-orange-400 font-medium">
                       Average priority
                     </p>
                   </CardContent>
@@ -488,33 +544,52 @@ export function SalesIntelligencePro({
               </div>
 
               {/* Top NBAs */}
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-white">
-                    <Brain className="w-5 h-5" />
+              <Card className="bg-gray-950 border-gray-800">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center space-x-3 text-white text-lg">
+                    <Brain className="w-6 h-6 text-orange-400" />
                     <span>Top Next Best Actions</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {nbas.slice(0, 5).map((nba) => (
-                      <div key={nba.id} className="flex items-center justify-between p-4 border border-gray-600 rounded-lg bg-gray-700">
+                      <div key={nba.id} className="flex items-center justify-between p-5 border border-gray-800 rounded-xl bg-gray-900 hover:bg-gray-800 transition-all duration-200">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <Badge variant="outline" className="text-blue-400 border-blue-500">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <Badge variant="outline" className="text-blue-400 border-blue-500 bg-blue-950">
                               {nba.playType}
                             </Badge>
-                            <span className="font-medium text-white">{nba.title}</span>
-                            <Badge variant="secondary" className="bg-gray-600 text-gray-300">Priority {nba.priority}</Badge>
+                            <span className="font-semibold text-white text-base">{nba.title}</span>
+                            <Badge variant="secondary" className="bg-orange-900 text-orange-300 border-orange-700">
+                              Priority {nba.priority}
+                            </Badge>
                           </div>
-                          <p className="text-sm text-gray-300 mb-2">{nba.description}</p>
-                          <p className="text-xs text-gray-400">{nba.rationale}</p>
+                          <p className="text-sm text-gray-300 mb-2 leading-relaxed">{nba.description}</p>
+                          <p className="text-xs text-gray-500">{nba.rationale}</p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Button size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-600">
+                        <div className="flex items-center space-x-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-gray-600 transition-all duration-200"
+                            onClick={() => {
+                              // View NBA details functionality
+                              console.log('Viewing NBA:', nba.id)
+                              // You can add a modal or detailed view here
+                            }}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25"
+                            onClick={() => {
+                              // Mark NBA as completed functionality
+                              console.log('Completing NBA:', nba.id)
+                              // You can add state management to mark as completed
+                            }}
+                          >
                             <CheckCircle className="w-4 h-4" />
                           </Button>
                         </div>
