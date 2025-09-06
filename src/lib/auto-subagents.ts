@@ -1,4 +1,4 @@
-import { invokeSubagent } from './subagents'
+import { subagentService } from './subagents'
 import { perplexityService } from './perplexity'
 import { db } from './db'
 import { Company, Contact, Opportunity, Meeting } from '@/types'
@@ -110,7 +110,7 @@ Company Context: ${context.company.priorityLevel} priority`
       const gettyAccount = getAccountByName(context.company.name)
       const agent = gettyAccount ? 'getty-images-executive' : 'sales-executive'
       
-      const briefResult = await invokeSubagent({
+      const briefResult = await subagentService.invokeSubagent({
         agent,
         task: briefTask,
         context: `Role: ${context.contact.role}, Industry: ${context.company.subIndustry}${gettyAccount ? `, Getty Tier ${gettyAccount.tier}` : ''}`,
@@ -149,7 +149,7 @@ Include:
 Context: ${context.company.subIndustry} industry, ${context.contact.role} role`
 
     try {
-      const followupResult = await invokeSubagent({
+      const followupResult = await subagentService.invokeSubagent({
         agent: 'sales-executive',
         task: followupTask,
         context: `Meeting completed recently, need immediate follow-up`,
@@ -189,7 +189,7 @@ Provide:
 Deal Context: ${context.opportunity.stage} stage, $${context.opportunity.value} value`
 
     try {
-      const analysisResult = await invokeSubagent({
+      const analysisResult = await subagentService.invokeSubagent({
         agent: 'sales-executive',
         task: analysisTask,
         context: `New opportunity analysis needed`,
@@ -236,7 +236,7 @@ Focus on:
 Target personas: ${this.EXECUTIVE_PERSONAS.join(', ')}`
 
     try {
-      const intelResult = await invokeSubagent({
+      const intelResult = await subagentService.invokeSubagent({
         agent: 'sales-executive',
         task: intelTask,
         context: `Fortune 1000 ${context.company.subIndustry} company intelligence`,
@@ -283,7 +283,7 @@ Include:
 Industry: ${context.company.subIndustry}, Company Size: Fortune 1000`
 
     try {
-      const engagementResult = await invokeSubagent({
+      const engagementResult = await subagentService.invokeSubagent({
         agent: 'sales-executive',
         task: engagementTask,
         context: `Executive engagement for ${context.contact.role}`,
@@ -335,7 +335,7 @@ Provide:
 Focus on immediate revenue impact and long-term account growth.`
 
     try {
-      const expansionResult = await invokeSubagent({
+      const expansionResult = await subagentService.invokeSubagent({
         agent: 'getty-images-executive',
         task: expansionTask,
         context: `Getty Images account expansion for ${gettyAccount.tier === 1 ? 'Tier 1' : gettyAccount.tier === 2 ? 'Tier 2' : 'Tier 3'} account`,
@@ -387,7 +387,7 @@ Strategy Requirements:
 Focus on driving visual content consumption and revenue growth.`
 
     try {
-      const strategyResult = await invokeSubagent({
+      const strategyResult = await subagentService.invokeSubagent({
         agent: 'getty-images-executive',
         task: strategyTask,
         context: `Visual content strategy for ${gettyAccount.industry} industry`,
