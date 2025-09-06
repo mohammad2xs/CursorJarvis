@@ -59,9 +59,6 @@ import {
 } from 'lucide-react'
 import { MeetingWithRelations, OpportunityWithRelations, NBA, CompanyWithRelations } from '@/types'
 import { formatDateTime, getRelativeTime, getStageColor } from '@/lib/utils'
-import { nbaBrain } from '@/lib/nba-brain'
-import { brandStudio } from '@/lib/brand-studio'
-import { perplexityService } from '@/lib/perplexity'
 
 interface SalesIntelligenceProProps {
   meetings: MeetingWithRelations[]
@@ -168,14 +165,26 @@ export function SalesIntelligencePro({
   const loadNBAs = async () => {
     setNbaLoading(true)
     try {
-      const allNBAs: NBA[] = []
-      for (const company of companies.slice(0, 5)) { // Limit to top 5 companies
-        const companyNBAs = await nbaBrain.generateNBAs(company.id)
-        allNBAs.push(...companyNBAs)
+      const response = await fetch('/api/nba/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          companyIds: companies.map(c => c.id) 
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to load NBAs: ${response.statusText}`)
       }
-      setNbas(allNBAs.sort((a, b) => b.priority - a.priority))
+
+      const { nbas } = await response.json()
+      setNbas(nbas || [])
     } catch (error) {
       console.error('Error loading NBAs:', error)
+      // Set empty array on error to prevent UI issues
+      setNbas([])
     } finally {
       setNbaLoading(false)
     }
@@ -294,13 +303,13 @@ export function SalesIntelligencePro({
   }, [selectedFolder, folders, searchQuery])
 
   return (
-    <div className="h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-900 flex">
       {/* Left Sidebar - Project Folders */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
+      <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+        <div className="p-4 border-b border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Sales Intelligence Pro</h2>
-            <Button size="sm" variant="outline">
+            <h2 className="text-lg font-semibold text-white">Sales Intelligence Pro</h2>
+            <Button size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
               <Plus className="w-4 h-4" />
             </Button>
           </div>
@@ -311,7 +320,7 @@ export function SalesIntelligencePro({
               placeholder="Search projects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
             />
           </div>
         </div>
@@ -322,21 +331,21 @@ export function SalesIntelligencePro({
               key={folder.id}
               className={`p-3 rounded-lg cursor-pointer transition-colors ${
                 selectedFolder === folder.id
-                  ? 'bg-blue-50 border-blue-200 border'
-                  : 'hover:bg-gray-50'
+                  ? 'bg-blue-900 border-blue-600 border'
+                  : 'hover:bg-gray-700'
               }`}
               onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   {selectedFolder === folder.id ? (
-                    <FolderOpen className={`w-5 h-5 text-${folder.color}-600`} />
+                    <FolderOpen className={`w-5 h-5 text-${folder.color}-400`} />
                   ) : (
-                    <Folder className={`w-5 h-5 text-${folder.color}-600`} />
+                    <Folder className={`w-5 h-5 text-${folder.color}-400`} />
                   )}
                   <div>
-                    <p className="font-medium text-gray-900">{folder.name}</p>
-                    <p className="text-sm text-gray-500">{folder.items.length} items</p>
+                    <p className="font-medium text-white">{folder.name}</p>
+                    <p className="text-sm text-gray-400">{folder.items.length} items</p>
                   </div>
                 </div>
                 <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${
@@ -348,30 +357,30 @@ export function SalesIntelligencePro({
         </div>
 
         {/* Recording Controls */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-700">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Call Recording</span>
-              <Badge variant={recording.isRecording ? "destructive" : "secondary"}>
+              <span className="text-sm font-medium text-gray-300">Call Recording</span>
+              <Badge variant={recording.isRecording ? "destructive" : "secondary"} className="bg-gray-700 text-gray-300">
                 {recording.isRecording ? 'Recording' : 'Ready'}
               </Badge>
             </div>
             
             <div className="flex items-center space-x-2">
               {!recording.isRecording ? (
-                <Button onClick={startRecording} size="sm" className="flex-1">
+                <Button onClick={startRecording} size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
                   <Mic className="w-4 h-4 mr-2" />
                   Start Recording
                 </Button>
               ) : (
                 <>
-                  <Button onClick={pauseRecording} size="sm" variant="outline">
+                  <Button onClick={pauseRecording} size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
                     {recording.isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
                   </Button>
-                  <Button onClick={stopRecording} size="sm" variant="destructive">
+                  <Button onClick={stopRecording} size="sm" variant="destructive" className="bg-red-600 hover:bg-red-700">
                     <Square className="w-4 h-4" />
                   </Button>
-                  <span className="text-sm text-gray-500 ml-2">
+                  <span className="text-sm text-gray-400 ml-2">
                     {formatDuration(recording.duration)}
                   </span>
                 </>
@@ -384,30 +393,30 @@ export function SalesIntelligencePro({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Navigation */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="dashboard" className="flex items-center space-x-2">
+            <TabsList className="grid w-full grid-cols-6 bg-gray-700">
+              <TabsTrigger value="dashboard" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
               </TabsTrigger>
-              <TabsTrigger value="nba-brain" className="flex items-center space-x-2">
+              <TabsTrigger value="nba-brain" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
                 <Brain className="w-4 h-4" />
                 <span>NBA Brain</span>
               </TabsTrigger>
-              <TabsTrigger value="meetings" className="flex items-center space-x-2">
+              <TabsTrigger value="meetings" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
                 <Calendar className="w-4 h-4" />
                 <span>Meetings</span>
               </TabsTrigger>
-              <TabsTrigger value="deals" className="flex items-center space-x-2">
+              <TabsTrigger value="deals" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
                 <Target className="w-4 h-4" />
                 <span>Deals</span>
               </TabsTrigger>
-              <TabsTrigger value="brand" className="flex items-center space-x-2">
+              <TabsTrigger value="brand" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
                 <Sparkles className="w-4 h-4" />
                 <span>Brand Studio</span>
               </TabsTrigger>
-              <TabsTrigger value="chat" className="flex items-center space-x-2">
+              <TabsTrigger value="chat" className="flex items-center space-x-2 data-[state=active]:bg-gray-600 data-[state=active]:text-white text-gray-300">
                 <MessageSquare className="w-4 h-4" />
                 <span>AI Chat</span>
               </TabsTrigger>
@@ -416,62 +425,62 @@ export function SalesIntelligencePro({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-900">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* Dashboard Tab */}
             <TabsContent value="dashboard" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Deals</CardTitle>
-                    <Target className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-white">Active Deals</CardTitle>
+                    <Target className="h-4 w-4 text-gray-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{opportunities.length}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold text-white">{opportunities.length}</div>
+                    <p className="text-xs text-gray-400">
                       +12% from last month
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-white">Pipeline Value</CardTitle>
+                    <DollarSign className="h-4 w-4 text-gray-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-2xl font-bold text-white">
                       ${opportunities.reduce((sum, opp) => sum + (opp.amount || 0), 0).toLocaleString()}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-400">
                       +8% from last month
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Upcoming Meetings</CardTitle>
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-white">Upcoming Meetings</CardTitle>
+                    <Calendar className="h-4 w-4 text-gray-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{meetings.length}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold text-white">{meetings.length}</div>
+                    <p className="text-xs text-gray-400">
                       Next 7 days
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">NBA Score</CardTitle>
-                    <Brain className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-white">NBA Score</CardTitle>
+                    <Brain className="h-4 w-4 text-gray-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-2xl font-bold text-white">
                       {nbas.length > 0 ? Math.round(nbas.reduce((sum, nba) => sum + nba.priority, 0) / nbas.length) : 0}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-400">
                       Average priority
                     </p>
                   </CardContent>
@@ -479,9 +488,9 @@ export function SalesIntelligencePro({
               </div>
 
               {/* Top NBAs */}
-              <Card>
+              <Card className="bg-gray-800 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                  <CardTitle className="flex items-center space-x-2 text-white">
                     <Brain className="w-5 h-5" />
                     <span>Top Next Best Actions</span>
                   </CardTitle>
@@ -489,23 +498,23 @@ export function SalesIntelligencePro({
                 <CardContent>
                   <div className="space-y-4">
                     {nbas.slice(0, 5).map((nba) => (
-                      <div key={nba.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div key={nba.id} className="flex items-center justify-between p-4 border border-gray-600 rounded-lg bg-gray-700">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <Badge variant="outline" className="text-blue-600">
+                            <Badge variant="outline" className="text-blue-400 border-blue-500">
                               {nba.playType}
                             </Badge>
-                            <span className="font-medium">{nba.title}</span>
-                            <Badge variant="secondary">Priority {nba.priority}</Badge>
+                            <span className="font-medium text-white">{nba.title}</span>
+                            <Badge variant="secondary" className="bg-gray-600 text-gray-300">Priority {nba.priority}</Badge>
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">{nba.description}</p>
-                          <p className="text-xs text-gray-500">{nba.rationale}</p>
+                          <p className="text-sm text-gray-300 mb-2">{nba.description}</p>
+                          <p className="text-xs text-gray-400">{nba.rationale}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-600">
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button size="sm">
+                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                             <CheckCircle className="w-4 h-4" />
                           </Button>
                         </div>
