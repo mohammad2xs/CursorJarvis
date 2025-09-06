@@ -141,7 +141,7 @@ Similar ${mockMeeting.company.subIndustry} companies have achieved:
 **Status:** Ready for meeting preparation
     `.trim()
 
-    return NextResponse.json({ content: briefContent })
+    return NextResponse.json({ brief: briefContent })
   } catch (error) {
     console.error('Error generating mock meeting brief:', error)
     return NextResponse.json(
