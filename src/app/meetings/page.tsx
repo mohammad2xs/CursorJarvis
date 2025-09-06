@@ -207,11 +207,6 @@ export default function MeetingsPage() {
     }
   }
 
-  const handleGenerateBrief = async (meetingId: string) => {
-    // This will be handled by the MeetingOS component
-    console.log('Generating brief for meeting:', meetingId)
-  }
-
   const handleGenerateRecap = async (meetingId: string, notes: string) => {
     // This will be handled by the MeetingOS component
     console.log('Generating recap for meeting:', meetingId, 'with notes:', notes)
@@ -243,7 +238,6 @@ export default function MeetingsPage() {
           <MeetingOS 
             meetings={meetings}
             onUpdateMeeting={handleUpdateMeeting}
-            onGenerateBrief={handleGenerateBrief}
             onGenerateRecap={handleGenerateRecap}
           />
         </main>

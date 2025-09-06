@@ -24,11 +24,10 @@ import { formatDateTime, getRelativeTime, getStageColor } from '@/lib/utils'
 interface MeetingOSProps {
   meetings: MeetingWithRelations[]
   onUpdateMeeting: (meetingId: string, updates: Partial<Meeting>) => void
-  onGenerateBrief: (meetingId: string) => void
   onGenerateRecap: (meetingId: string, notes: string) => void
 }
 
-export function MeetingOS({ meetings, onUpdateMeeting, onGenerateBrief, onGenerateRecap }: MeetingOSProps) {
+export function MeetingOS({ meetings, onUpdateMeeting, onGenerateRecap }: MeetingOSProps) {
   const [upcomingMeetings, setUpcomingMeetings] = useState<MeetingWithRelations[]>([])
   const [recentMeetings, setRecentMeetings] = useState<MeetingWithRelations[]>([])
   const [selectedMeeting, setSelectedMeeting] = useState<MeetingWithRelations | null>(null)
