@@ -4,6 +4,8 @@ import { conversationIntelligenceService, ConversationContext, RealTimeCoaching 
 import { visualContentAIService, VisualContentStrategy } from './visual-content-ai'
 import { proactiveInsightsService, ProactiveInsight, CustomerSatisfactionInsight } from './proactive-insights'
 import { getAccountByName } from './getty-accounts'
+import { BaseService, CompanyContext } from './base-service'
+import { executeParallel } from './utils'
 
 export interface EnhancedCursorJarvisDashboard {
   accountId: string
@@ -59,7 +61,7 @@ export interface RealTimeCoachingRequest {
   context: ConversationContext
 }
 
-export class EnhancedCursorJarvisService {
+export class EnhancedCursorJarvisService extends BaseService {
   async processCallRecording(request: CallRecordingRequest): Promise<{
     analysis: CallAnalysis
     insights: string[]
@@ -119,11 +121,11 @@ export class EnhancedCursorJarvisService {
   }
 
   async generateEnhancedDashboard(accountId: string): Promise<EnhancedCursorJarvisDashboard> {
-    try {
+    return this.executeWithTimeout(async () => {
       const gettyAccount = getAccountByName(accountId)
       if (!gettyAccount) throw new Error('Account not found')
 
-      // Get all insights and data in parallel
+      // Get all insights and data in parallel for better performance
       const [
         voiceInsights,
         revenueIntelligence,
@@ -131,13 +133,13 @@ export class EnhancedCursorJarvisService {
         visualContentStrategy,
         proactiveInsights,
         customerSatisfaction
-      ] = await Promise.all([
-        this.getVoiceInsights(accountId),
-        this.getRevenueIntelligence(accountId),
-        this.getConversationIntelligence(accountId),
-        visualContentAIService.generateVisualContentStrategy(accountId),
-        proactiveInsightsService.generateProactiveInsights(accountId),
-        proactiveInsightsService.analyzeCustomerSatisfaction(accountId)
+      ] = await this.executeParallel([
+        () => this.getVoiceInsights(accountId),
+        () => this.getRevenueIntelligence(accountId),
+        () => this.getConversationIntelligence(accountId),
+        () => visualContentAIService.generateVisualContentStrategy(accountId),
+        () => proactiveInsightsService.generateProactiveInsights(accountId),
+        () => proactiveInsightsService.analyzeCustomerSatisfaction(accountId)
       ])
 
       // Generate next actions
@@ -161,10 +163,7 @@ export class EnhancedCursorJarvisService {
         customerSatisfaction,
         nextActions
       }
-    } catch (error) {
-      console.error('Error generating enhanced dashboard:', error)
-      throw new Error('Failed to generate enhanced dashboard')
-    }
+    }, 30000) // 30 second timeout
   }
 
   async trackRevenueAttribution(attribution: Omit<RevenueAttribution, 'id' | 'timestamp'>): Promise<RevenueAttribution> {

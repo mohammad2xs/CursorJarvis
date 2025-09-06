@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -51,7 +51,7 @@ interface EnhancedJarvisDashboardProps {
   accountId: string
 }
 
-export function EnhancedJarvisDashboard({ accountId }: EnhancedJarvisDashboardProps) {
+const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProps) => {
   const [dashboard, setDashboard] = useState<EnhancedCursorJarvisDashboard | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -400,4 +400,8 @@ export function EnhancedJarvisDashboard({ accountId }: EnhancedJarvisDashboardPr
       </Tabs>
     </div>
   )
-}
+})
+
+EnhancedJarvisDashboard.displayName = 'EnhancedJarvisDashboard'
+
+export { EnhancedJarvisDashboard }

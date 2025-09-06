@@ -15,20 +15,14 @@ echo "📁 Creating deployment directory..."
 mkdir -p ../deploy/chrome-extension
 rm -rf ../deploy/chrome-extension/*
 
-# Copy extension files
+# Copy extension files (excluding source control and docs)
 echo "📋 Copying extension files..."
-cp -r . ../deploy/chrome-extension/
-
-# Remove unnecessary files
-echo "🧹 Cleaning up deployment files..."
-cd ../deploy/chrome-extension
-rm -f README.md
-rm -f deploy.sh
-rm -rf .git
+rsync -av --exclude='.git' --exclude='README.md' --exclude='deploy.sh' --exclude='USAGE_GUIDE.md' . ../deploy/chrome-extension/
 
 # Create zip file
 echo "📦 Creating extension package..."
-zip -r cursorjarvis-extension.zip . -x "*.DS_Store" "*.git*" "deploy.sh" "README.md"
+cd ../deploy/chrome-extension
+zip -r cursorjarvis-extension.zip . -x "*.DS_Store" "*.git*"
 
 echo "✅ Extension packaged successfully!"
 echo "📁 Location: ../deploy/chrome-extension/cursorjarvis-extension.zip"
@@ -38,4 +32,3 @@ echo "1. Open Chrome and go to chrome://extensions/"
 echo "2. Enable 'Developer mode'"
 echo "3. Click 'Load unpacked' and select the chrome-extension folder"
 echo "4. Or upload the zip file to Chrome Web Store"
-update zip file

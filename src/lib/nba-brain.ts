@@ -2,8 +2,10 @@ import { db } from './db'
 import { NBA, NBAContext, NBAScore, PlayType, NBAStatus, Company, Contact, Opportunity, AccountSignal, Activity } from '@/types'
 import { calculateDaysSince } from './utils'
 import { autoSubagentOrchestrator } from './auto-subagents'
+import { BaseService, CompanyContext } from './base-service'
+import { executeParallel } from './utils'
 
-export class NBABrain {
+export class NBABrain extends BaseService {
   private createNBA(partialNBA: Partial<NBA>): NBA {
     return {
       id: `nba-${Date.now()}-${Math.random()}`,
@@ -24,63 +26,54 @@ export class NBABrain {
   }
 
   async generateNBAs(companyId: string): Promise<NBA[]> {
-    const context = await this.getNBAContext(companyId)
-    const nbas: NBA[] = []
+    return this.executeWithTimeout(async () => {
+      const context = await this.getNBAContext(companyId)
+      const nbas: NBA[] = []
 
-    // Generate NBAs based on different triggers
-    nbas.push(...await this.generatePreMeetingNBAs(context))
-    nbas.push(...await this.generatePostMeetingNBAs(context))
-    nbas.push(...await this.generateNewLeadNBAs(context))
-    nbas.push(...await this.generateVPCMONoTouchNBAs(context))
-    nbas.push(...await this.generateOppIdleNBAs(context))
-    nbas.push(...await this.generateEngagementDetectedNBAs(context))
-    nbas.push(...await this.generatePerplexityNewsNBAs(context))
-    nbas.push(...await this.generatePerplexityHireNBAs(context))
+      // Generate NBAs based on different triggers in parallel for better performance
+      const nbaGenerators = [
+        () => this.generatePreMeetingNBAs(context),
+        () => this.generatePostMeetingNBAs(context),
+        () => this.generateNewLeadNBAs(context),
+        () => this.generateVPCMONoTouchNBAs(context),
+        () => this.generateOppIdleNBAs(context),
+        () => this.generateEngagementDetectedNBAs(context),
+        () => this.generatePerplexityNewsNBAs(context),
+        () => this.generatePerplexityHireNBAs(context)
+      ]
 
-    // Auto-generate subagent insights
-    await this.generateAutoSubagentInsights(context)
+      const generatedNBAs = await executeParallel(nbaGenerators)
+      nbas.push(...generatedNBAs.flat())
 
-    // Score and prioritize NBAs
-    const scoredNBAs = await this.scoreNBAs(nbas, context)
-    
-    // Save to database
-    const savedNBAs = await this.saveNBAs(scoredNBAs)
+      // Auto-generate subagent insights
+      await this.generateAutoSubagentInsights(context)
 
-    return savedNBAs
+      // Score and prioritize NBAs
+      const scoredNBAs = await this.scoreNBAs(nbas, context)
+      
+      // Save to database
+      const savedNBAs = await this.saveNBAs(scoredNBAs)
+
+      return savedNBAs
+    }, 60000) // 60 second timeout for NBA generation
   }
 
   private async getNBAContext(companyId: string): Promise<NBAContext> {
-    const company = await db.company.findUnique({
-      where: { id: companyId },
-      include: {
-        contacts: true,
-        opportunities: true,
-        accountSignals: {
-          where: {
-            detectedAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
-            }
-          },
-          orderBy: { detectedAt: 'desc' },
-          take: 10
-        },
-        activities: {
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        }
-      }
+    const context = await this.getCompanyContext(companyId, {
+      includeContacts: true,
+      includeOpportunities: true,
+      includeSignals: true,
+      includeActivities: true,
+      signalsDays: 30,
+      activitiesLimit: 10
     })
 
-    if (!company) {
-      throw new Error('Company not found')
-    }
-
     return {
-      company,
-      contact: company.contacts[0] || null,
-      opportunity: company.opportunities[0] || null,
-      recentSignals: company.accountSignals,
-      recentActivities: company.activities
+      company: context.company,
+      contact: context.contact,
+      opportunity: context.opportunity,
+      recentSignals: context.recentSignals,
+      recentActivities: context.recentActivities
     }
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,29 +23,29 @@ import {
 } from 'lucide-react'
 import { brandStudio } from '@/lib/brand-studio'
 
-export function BrandStudio() {
+const BrandStudio = memo(() => {
   const [selectedSubIndustry, setSelectedSubIndustry] = useState('Tech/SaaS')
   const [selectedDealType, setSelectedDealType] = useState('NEW_LOGO')
   const [companyName, setCompanyName] = useState('')
   const [generatedContent, setGeneratedContent] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
 
-  const subIndustries = [
+  const subIndustries = useMemo(() => [
     'Aerospace & Defense',
     'Oil & Gas/Energy', 
     'Healthcare/MedSys',
     'Consumer/CPG',
     'Tech/SaaS'
-  ]
+  ], [])
 
-  const dealTypes = [
+  const dealTypes = useMemo(() => [
     'NEW_LOGO',
     'RENEWAL',
     'UPSELL',
     'STRATEGIC'
-  ]
+  ], [])
 
-  const generateContent = async (type: string) => {
+  const generateContent = useCallback(async (type: string) => {
     setIsGenerating(true)
     
     try {
@@ -85,15 +85,15 @@ export function BrandStudio() {
     } finally {
       setIsGenerating(false)
     }
-  }
+  }, [selectedSubIndustry, selectedDealType, companyName])
 
-  const copyToClipboard = () => {
+  const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(generatedContent)
-  }
+  }, [generatedContent])
 
-  const validateMessage = (message: string) => {
+  const validateMessage = useCallback((message: string) => {
     return brandStudio.validateMessage(message)
-  }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -400,4 +400,8 @@ export function BrandStudio() {
       </Tabs>
     </div>
   )
-}
+})
+
+BrandStudio.displayName = 'BrandStudio'
+
+export { BrandStudio }

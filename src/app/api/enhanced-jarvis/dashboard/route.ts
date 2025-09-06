@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { enhancedCursorJarvisService } from '@/lib/enhanced-cursor-jarvis'
+import { APIHandler } from '@/lib/api-handler'
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
+  return APIHandler.handleRequest(async () => {
+    const searchParams = APIHandler.getSearchParams(request)
     const accountId = searchParams.get('accountId')
 
-    if (!accountId) {
-      return NextResponse.json({ error: 'Account ID is required' }, { status: 400 })
-    }
-
-    const dashboard = await enhancedCursorJarvisService.generateEnhancedDashboard(accountId)
-
-    return NextResponse.json(dashboard)
-  } catch (error) {
-    console.error('Error generating enhanced dashboard:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate enhanced dashboard' },
-      { status: 500 }
+    // Validate required parameters
+    const validationError = APIHandler.validateRequiredParams(
+      { accountId },
+      ['accountId']
     )
-  }
+    if (validationError) return validationError
+
+    return await enhancedCursorJarvisService.generateEnhancedDashboard(accountId!)
+  }, 'Failed to generate enhanced dashboard')
 }

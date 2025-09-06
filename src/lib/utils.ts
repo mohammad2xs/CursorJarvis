@@ -137,3 +137,31 @@ export function getRelativeTime(date: Date | string) {
     return 'Just now'
   }
 }
+
+/**
+ * Execute multiple operations in parallel with error handling
+ */
+export async function executeParallel<T>(
+  operations: (() => Promise<T>)[]
+): Promise<T[]> {
+  try {
+    return await Promise.all(operations.map(op => op()))
+  } catch (error) {
+    console.error('Error in parallel execution:', error)
+    throw error
+  }
+}
+
+/**
+ * Execute operation with timeout
+ */
+export async function executeWithTimeout<T>(
+  operation: () => Promise<T>,
+  timeoutMs: number = 30000
+): Promise<T> {
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('Operation timeout')), timeoutMs)
+  })
+
+  return Promise.race([operation(), timeoutPromise])
+}
