@@ -34,6 +34,9 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateBrief, onGenera
   const [selectedMeeting, setSelectedMeeting] = useState<MeetingWithRelations | null>(null)
   const [meetingNotes, setMeetingNotes] = useState('')
   const [briefContent, setBriefContent] = useState('')
+  const [isGeneratingBrief, setIsGeneratingBrief] = useState(false)
+  const [briefError, setBriefError] = useState<string | null>(null)
+  const [debugInfo, setDebugInfo] = useState<any>(null)
 
   useEffect(() => {
     const now = new Date()
@@ -51,8 +54,14 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateBrief, onGenera
   }, [meetings])
 
   const handleGenerateBrief = async (meeting: MeetingWithRelations) => {
+    setIsGeneratingBrief(true)
+    setBriefError(null)
+    
     try {
-      const response = await fetch('/api/meetings/brief', {
+      console.log('Generating brief for meeting:', meeting.id)
+      
+      // Try main API first
+      let response = await fetch('/api/meetings/brief', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,13 +74,63 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateBrief, onGenera
         }),
       })
 
+      console.log('Brief API response status:', response.status)
+
+      // If main API fails, try fallback
+      if (!response.ok) {
+        console.log('Main API failed, trying fallback...')
+        response = await fetch('/api/meetings/brief-fallback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            meetingId: meeting.id,
+            companyId: meeting.companyId,
+            contactId: meeting.contactId,
+            opportunityId: meeting.opportunityId
+          }),
+        })
+        console.log('Fallback API response status:', response.status)
+      }
+
       if (response.ok) {
         const brief = await response.json()
+        console.log('Brief generated successfully:', brief)
         setBriefContent(brief.content)
         setSelectedMeeting(meeting)
+        setBriefError(null)
+      } else {
+        const errorData = await response.json()
+        console.error('Brief API error:', errorData)
+        setBriefError(errorData.error || 'Failed to generate brief')
       }
     } catch (error) {
       console.error('Error generating brief:', error)
+      setBriefError('Network error: Failed to generate brief')
+    } finally {
+      setIsGeneratingBrief(false)
+    }
+  }
+
+  const handleDebugBrief = async (meeting: MeetingWithRelations) => {
+    try {
+      const response = await fetch('/api/debug/meeting-brief', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          meetingId: meeting.id
+        }),
+      })
+
+      const debug = await response.json()
+      setDebugInfo(debug)
+      console.log('Debug info:', debug)
+    } catch (error) {
+      console.error('Debug error:', error)
+      setDebugInfo({ error: 'Debug failed' })
     }
   }
 
@@ -156,6 +215,32 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateBrief, onGenera
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {briefError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center">
+                    <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+                    <p className="text-red-800">{briefError}</p>
+                  </div>
+                </div>
+              )}
+              {debugInfo && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-yellow-800">Debug Information</h3>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDebugInfo(null)}
+                      className="text-yellow-800"
+                    >
+                      Close
+                    </Button>
+                  </div>
+                  <pre className="mt-2 text-sm text-yellow-700 bg-yellow-100 p-2 rounded overflow-auto">
+                    {JSON.stringify(debugInfo, null, 2)}
+                  </pre>
+                </div>
+              )}
               {upcomingMeetings.map((meeting) => (
                 <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex-1">
@@ -199,10 +284,20 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateBrief, onGenera
                     <Button
                       size="sm"
                       onClick={() => handleGenerateBrief(meeting)}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={isGeneratingBrief}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
                     >
                       <Brain className="w-4 h-4 mr-1" />
-                      Generate Brief
+                      {isGeneratingBrief ? 'Generating...' : 'Generate Brief'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDebugBrief(meeting)}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                    >
+                      <AlertCircle className="w-4 h-4 mr-1" />
+                      Debug
                     </Button>
                     <Button
                       size="sm"
