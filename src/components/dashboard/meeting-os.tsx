@@ -91,6 +91,24 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateRecap }: Meetin
           }),
         })
         console.log('Fallback API response status:', response.status)
+        
+        // If fallback also fails, try mock API
+        if (!response.ok) {
+          console.log('Fallback API failed, trying mock...')
+          response = await fetch('/api/meetings/brief-mock', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              meetingId: meeting.id,
+              companyId: meeting.companyId,
+              contactId: meeting.contactId,
+              opportunityId: meeting.opportunityId
+            }),
+          })
+          console.log('Mock API response status:', response.status)
+        }
       }
 
       if (response.ok) {
