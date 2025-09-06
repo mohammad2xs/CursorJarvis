@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MeetingOS } from '@/components/dashboard/meeting-os-simplified'
+import { SalesIntelligencePro } from '@/components/dashboard/sales-intelligence-pro'
 import { MeetingWithRelations } from '@/types'
 
 export default function MeetingsPage() {
   const [meetings, setMeetings] = useState<MeetingWithRelations[]>([])
+  const [opportunities, setOpportunities] = useState<any[]>([])
+  const [companies, setCompanies] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -175,8 +177,94 @@ export default function MeetingsPage() {
       }
     ]
 
+    const mockOpportunities = [
+      {
+        id: 'opp_1',
+        name: 'Acme Corp - Creative Platform',
+        dealType: 'NEW_LOGO',
+        stage: 'DISCOVER',
+        amount: 50000,
+        probability: 25,
+        closeDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        companyId: 'comp_1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        company: {
+          id: 'comp_1',
+          name: 'Acme Corporation',
+          subIndustry: 'Tech/SaaS',
+          priorityLevel: 'STRATEGIC'
+        }
+      },
+      {
+        id: 'opp_2',
+        name: 'TechCorp - Creative Suite',
+        dealType: 'NEW_LOGO',
+        stage: 'EVALUATE',
+        amount: 75000,
+        probability: 40,
+        closeDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+        companyId: 'comp_2',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        company: {
+          id: 'comp_2',
+          name: 'TechCorp',
+          subIndustry: 'Tech/SaaS',
+          priorityLevel: 'GROWTH'
+        }
+      },
+      {
+        id: 'opp_3',
+        name: 'Global Industries - Brand Platform',
+        dealType: 'NEW_LOGO',
+        stage: 'PROPOSE',
+        amount: 100000,
+        probability: 60,
+        closeDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+        companyId: 'comp_3',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        company: {
+          id: 'comp_3',
+          name: 'Global Industries',
+          subIndustry: 'Oil & Gas/Energy',
+          priorityLevel: 'GROWTH'
+        }
+      }
+    ]
+
+    const mockCompanies = [
+      {
+        id: 'comp_1',
+        name: 'Acme Corporation',
+        subIndustry: 'Tech/SaaS',
+        priorityLevel: 'STRATEGIC',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'comp_2',
+        name: 'TechCorp',
+        subIndustry: 'Tech/SaaS',
+        priorityLevel: 'GROWTH',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'comp_3',
+        name: 'Global Industries',
+        subIndustry: 'Oil & Gas/Energy',
+        priorityLevel: 'GROWTH',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ]
+
     setTimeout(() => {
       setMeetings(mockMeetings)
+      setOpportunities(mockOpportunities)
+      setCompanies(mockCompanies)
       setLoading(false)
     }, 1000)
   }, [])
@@ -225,9 +313,12 @@ export default function MeetingsPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="px-4 py-6 sm:px-6 lg:px-8">
-          <MeetingOS 
+          <SalesIntelligencePro 
             meetings={meetings}
+            opportunities={opportunities}
+            companies={companies}
             onUpdateMeeting={handleUpdateMeeting}
+            onUpdateOpportunity={() => {}}
             onGenerateRecap={handleGenerateRecap}
           />
         </div>
