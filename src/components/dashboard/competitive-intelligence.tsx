@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendingUp, TrendingDown, AlertTriangle, Target, Eye, ExternalLink, RefreshCw, Plus, Bell, Users, Activity, Brain, Lightbulb, ArrowRight, Crown, Sword, Trophy, Info, Building, Check } from 'lucide-react'
+import { TrendingUp, AlertTriangle, Target, Eye, ExternalLink, RefreshCw, Plus, Bell, Users, Brain, Lightbulb, ArrowRight, Crown, Sword, Trophy, Info, Building, Check } from 'lucide-react'
 import { CompetitiveDashboard } from '@/lib/competitive-intelligence'
 
 interface CompetitiveIntelligenceProps {

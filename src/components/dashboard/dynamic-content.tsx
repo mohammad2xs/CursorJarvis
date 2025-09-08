@@ -6,126 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 // Input not used
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import {
-  FileText,
-  Wand2,
-  Target,
-  TrendingUp,
-  BarChart3,
-  Lightbulb,
-  Copy,
-  Download,
-  Share2,
-  Edit,
-  Trash2,
-  Play,
-  Pause,
-  RefreshCw,
-  Plus,
-  Eye,
-  Settings,
-  MessageSquare,
-  Mail,
-  Linkedin,
-  Presentation,
-  Calendar,
-  CheckCircle,
-  AlertCircle,
-  Star,
-  Clock,
-  Users,
-  Zap,
-  Brain,
-  Sparkles,
-  ArrowRight,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  Filter,
-  Search,
-  MoreHorizontal,
-  BookOpen,
-  PenTool,
-  Layers,
-  Palette,
-  Type,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Bold,
-  Italic,
-  Underline,
-  Link,
-  Image,
-  Video,
-  Mic,
-  Headphones,
-  Volume2,
-  VolumeX,
-  Maximize2,
-  Minimize2,
-  RotateCcw,
-  Save,
-  Send,
-  Check,
-  X,
-  PlusCircle,
-  MinusCircle,
-  Move,
-  GripVertical,
-  Hash,
-  AtSign,
-  DollarSign,
-  Percent,
-  Calendar as CalendarIcon,
-  Clock as ClockIcon,
-  MapPin,
-  Phone,
-  Globe,
-  Mail as MailIcon,
-  User,
-  Building,
-  Briefcase,
-  Award,
-  Trophy,
-  Flag,
-  Tag,
-  Bookmark,
-  Heart,
-  ThumbsUp,
-  ThumbsDown,
-  MessageCircle,
-  Reply,
-  Forward,
-  Archive,
-  Trash,
-  Folder,
-  FolderOpen,
-  File,
-  FileImage,
-  FileVideo,
-  FileAudio,
-  FileSpreadsheet,
-  FileCode,
-  FileArchive,
-  FileCheck,
-  FileX,
-  FilePlus,
-  FileMinus,
-  FileEdit,
-  FileSearch,
-  FileText as FileTextIcon,
-  FolderPlus,
-  FolderMinus,
-  FolderEdit,
-  FolderSearch,
-  FolderLock,
-  FolderOpen as FolderOpenIcon,
-  Folder as FolderIcon,
-  FolderCheck,
-  FolderX,
-  FolderArchive,
-} from 'lucide-react'
+import { FileText, Wand2, Target, TrendingUp, Lightbulb, Copy, Download, Share2, Edit, Pause, Play, RefreshCw, Plus, Eye, MessageSquare, Mail, Linkedin, Presentation, Calendar, CheckCircle, X } from 'lucide-react'
 import {
   ContentTemplate,
   GeneratedContent,
@@ -145,7 +26,7 @@ export function DynamicContent({ userId }: DynamicContentProps) {
   const [analytics, setAnalytics] = useState<ContentAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
   const [showGenerator, setShowGenerator] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
+  const [_selectedTemplate, _setSelectedTemplate] = useState<string | null>(null)
   const [generationRequest, setGenerationRequest] = useState<Partial<ContentGenerationRequest>>({
     userId,
     category: 'EMAIL',
@@ -155,11 +36,7 @@ export function DynamicContent({ userId }: DynamicContentProps) {
     includeCallToAction: true
   })
 
-  useEffect(() => {
-    loadContentData()
-  }, [userId])
-
-  const loadContentData = async () => {
+  const loadContentData = React.useCallback(async () => {
     try {
       setLoading(true)
       
@@ -186,7 +63,11 @@ export function DynamicContent({ userId }: DynamicContentProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    loadContentData()
+  }, [loadContentData])
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
