@@ -35,7 +35,7 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateRecap }: Meetin
   const [briefContent, setBriefContent] = useState('')
   const [isGeneratingBrief, setIsGeneratingBrief] = useState(false)
   const [briefError, setBriefError] = useState<string | null>(null)
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [debugInfo, setDebugInfo] = useState<Record<string, unknown> | null>(null)
 
   useEffect(() => {
     const now = new Date()
@@ -440,7 +440,7 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateRecap }: Meetin
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <Brain className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Click "Generate Brief" to create AI-powered meeting preparation</p>
+                      <p>Click &quot;Generate Brief&quot; to create AI-powered meeting preparation</p>
                     </div>
                   )}
                 </div>

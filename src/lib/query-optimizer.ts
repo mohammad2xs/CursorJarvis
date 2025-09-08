@@ -1,11 +1,12 @@
 import { db } from './db'
 import { Prisma } from '@prisma/client'
+import { Company, Contact, Opportunity, NBA, Activity, Meeting, AccountSignal } from '@/types'
 
 export interface QueryOptions {
   limit?: number
   offset?: number
   orderBy?: Record<string, 'asc' | 'desc'>
-  where?: Record<string, any>
+  where?: Record<string, unknown>
   include?: Record<string, boolean | object>
   select?: Record<string, boolean>
 }
@@ -34,7 +35,7 @@ export class QueryOptimizer {
    */
   static async getCompanies(
     options: QueryOptions & PaginationOptions = {}
-  ): Promise<QueryResult<any>> {
+  ): Promise<QueryResult<Company>> {
     const {
       page = 1,
       pageSize = 20,
@@ -82,7 +83,7 @@ export class QueryOptimizer {
    */
   static async getContacts(
     options: QueryOptions & PaginationOptions = {}
-  ): Promise<QueryResult<any>> {
+  ): Promise<QueryResult<Contact>> {
     const {
       page = 1,
       pageSize = 20,
@@ -128,7 +129,7 @@ export class QueryOptimizer {
    */
   static async getOpportunities(
     options: QueryOptions & PaginationOptions = {}
-  ): Promise<QueryResult<any>> {
+  ): Promise<QueryResult<Opportunity>> {
     const {
       page = 1,
       pageSize = 20,
@@ -177,7 +178,7 @@ export class QueryOptimizer {
    */
   static async getNBAs(
     options: QueryOptions & PaginationOptions = {}
-  ): Promise<QueryResult<any>> {
+  ): Promise<QueryResult<NBA>> {
     const {
       page = 1,
       pageSize = 20,
@@ -229,7 +230,7 @@ export class QueryOptimizer {
       signalTypes?: string[]
       orderBy?: Record<string, 'asc' | 'desc'>
     } = {}
-  ): Promise<any[]> {
+  ): Promise<AccountSignal[]> {
     const {
       days = 30,
       limit = 50,
@@ -237,7 +238,7 @@ export class QueryOptimizer {
       orderBy = { detectedAt: 'desc' }
     } = options
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       companyId,
       detectedAt: {
         gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
@@ -260,7 +261,7 @@ export class QueryOptimizer {
    */
   static async getActivities(
     options: QueryOptions & PaginationOptions = {}
-  ): Promise<QueryResult<any>> {
+  ): Promise<QueryResult<Activity>> {
     const {
       page = 1,
       pageSize = 20,
@@ -306,7 +307,7 @@ export class QueryOptimizer {
    */
   static async getMeetings(
     options: QueryOptions & PaginationOptions = {}
-  ): Promise<QueryResult<any>> {
+  ): Promise<QueryResult<Meeting>> {
     const {
       page = 1,
       pageSize = 20,
@@ -350,9 +351,9 @@ export class QueryOptimizer {
   /**
    * Execute raw SQL queries for complex operations
    */
-  static async executeRawQuery<T = any>(
+  static async executeRawQuery<T = unknown>(
     query: string,
-    params: any[] = []
+    params: unknown[] = []
   ): Promise<T[]> {
     return await db.$queryRaw<T[]>(Prisma.sql([query], ...params))
   }
@@ -421,12 +422,12 @@ export class QueryOptimizer {
    * Get dashboard data with optimized queries
    */
   static async getDashboardData(companyId: string): Promise<{
-    company: any
-    recentActivities: any[]
-    recentSignals: any[]
-    upcomingMeetings: any[]
-    recentNbas: any[]
-    stats: any
+    company: Company
+    recentActivities: Activity[]
+    recentSignals: AccountSignal[]
+    upcomingMeetings: Meeting[]
+    recentNbas: NBA[]
+    stats: Record<string, unknown>
   }> {
     const [
       company,
@@ -436,7 +437,7 @@ export class QueryOptimizer {
       recentNbas,
       stats
     ] = await Promise.all([
-      db.company.findUnique({
+      db.company.findUniqueOrThrow({
         where: { id: companyId },
         include: {
           contacts: { take: 5, orderBy: { createdAt: 'desc' } },
@@ -493,8 +494,8 @@ export class QueryOptimizer {
   /**
    * Batch operations for better performance
    */
-  static async batchCreate<T>(
-    model: any,
+  static async batchCreate<T, M extends { createMany: (args: { data: T[]; skipDuplicates?: boolean }) => Promise<{ count: number }> }>(
+    model: M,
     data: T[]
   ): Promise<{ count: number }> {
     return await model.createMany({
@@ -503,18 +504,18 @@ export class QueryOptimizer {
     })
   }
 
-  static async batchUpdate<T>(
-    model: any,
-    data: Array<{ where: any; data: T }>
+  static async batchUpdate<T, M extends { update: (args: { where: Record<string, unknown>; data: T }) => Promise<unknown> }>(
+    model: M,
+    data: Array<{ where: Record<string, unknown>; data: T }>
   ): Promise<void> {
     await Promise.all(
       data.map(({ where, data }) => model.update({ where, data }))
     )
   }
 
-  static async batchDelete(
-    model: any,
-    where: any
+  static async batchDelete<M extends { deleteMany: (args: { where: Record<string, unknown> }) => Promise<{ count: number }> }>(
+    model: M,
+    where: Record<string, unknown>
   ): Promise<{ count: number }> {
     return await model.deleteMany({ where })
   }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { meetingId, companyId, contactId, opportunityId } = await request.json()
+    const { meetingId } = await request.json()
 
     // Mock meeting data - in real app this would come from database
     const mockMeeting = {

@@ -1,6 +1,6 @@
 import { CACHE_TTL } from './constants'
 
-export interface CacheEntry<T = any> {
+export interface CacheEntry<T = unknown> {
   data: T
   timestamp: number
   ttl: number
@@ -40,7 +40,7 @@ class CacheManager {
   /**
    * Get value from cache
    */
-  get<T = any>(key: string): T | null {
+  get<T = unknown>(key: string): T | null {
     const entry = this.cache.get(key)
     
     if (!entry) {
@@ -57,13 +57,13 @@ class CacheManager {
     }
 
     if (this.enableStats) this.stats.hits++
-    return entry.data
+    return entry.data as T
   }
 
   /**
    * Set value in cache
    */
-  set<T = any>(key: string, data: T, ttl: number = CACHE_TTL.MEDIUM): void {
+  set<T = unknown>(key: string, data: T, ttl: number = CACHE_TTL.MEDIUM): void {
     // Check if we need to evict
     if (this.cache.size >= this.maxSize) {
       this.evictOldest()
@@ -187,7 +187,7 @@ class CacheManager {
   /**
    * Set multiple values at once
    */
-  setMany<T = any>(entries: Array<{ key: string; data: T; ttl?: number }>): void {
+  setMany<T = unknown>(entries: Array<{ key: string; data: T; ttl?: number }>): void {
     entries.forEach(({ key, data, ttl = CACHE_TTL.MEDIUM }) => {
       this.set(key, data, ttl)
     })
@@ -196,7 +196,7 @@ class CacheManager {
   /**
    * Get multiple values at once
    */
-  getMany<T = any>(keys: string[]): Map<string, T | null> {
+  getMany<T = unknown>(keys: string[]): Map<string, T | null> {
     const result = new Map<string, T | null>()
     
     keys.forEach(key => {
@@ -295,12 +295,12 @@ export const globalCache = new CacheManager({
 })
 
 // Cache decorator for functions
-export function cached<T extends any[], R>(
+export function cached<T extends unknown[], R>(
   cache: CacheManager,
   keyGenerator: (...args: T) => string,
   ttl?: number
 ) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value
 
     descriptor.value = async function (...args: T): Promise<R> {
@@ -323,7 +323,7 @@ export const cacheUtils = {
   /**
    * Generate cache key for company context
    */
-  companyContextKey: (companyId: string, options: any = {}) => 
+  companyContextKey: (companyId: string, options: Record<string, unknown> = {}) => 
     `company_context_${companyId}_${JSON.stringify(options)}`,
 
   /**

@@ -38,7 +38,7 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateRecap }: Meetin
   const [briefContent, setBriefContent] = useState('')
   const [isGeneratingBrief, setIsGeneratingBrief] = useState(false)
   const [briefError, setBriefError] = useState<string | null>(null)
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [debugInfo, setDebugInfo] = useState<Record<string, unknown> | null>(null)
 
   useEffect(() => {
     const now = new Date()
@@ -455,7 +455,7 @@ export function MeetingOS({ meetings, onUpdateMeeting, onGenerateRecap }: Meetin
 
                 {selectedMeeting.meetingUrl && (
                   <Button
-                    onClick={() => window.open(selectedMeeting.meetingUrl, '_blank')}
+                    onClick={() => window.open(selectedMeeting.meetingUrl || '', '_blank')}
                     className="w-full"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />

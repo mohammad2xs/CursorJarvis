@@ -126,7 +126,7 @@ export function WeeklyDigestComponent({ digest, onPromoteRule, onRetireRule }: W
             <CardHeader>
               <CardTitle className="flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2" />
-                This Week's Focus
+                This Week&apos;s Focus
               </CardTitle>
             </CardHeader>
             <CardContent>

@@ -1,9 +1,10 @@
-import { voiceAnalysisService, CallRecording, CallAnalysis } from './voice-analysis'
-import { revenueIntelligenceService, RevenueAttribution, RevenueForecast } from './revenue-intelligence'
-import { conversationIntelligenceService, ConversationContext, RealTimeCoaching } from './conversation-intelligence'
-import { visualContentAIService, VisualContentStrategy } from './visual-content-ai'
+import { voiceAnalysisService, CallRecording, CallAnalysis, VoiceInsights } from './voice-analysis'
+import { VoiceMetrics, RevenueTrend } from '@/types'
+import { revenueIntelligenceService, RevenueAttribution, RevenueForecast, RevenueOptimization, RevenueIntelligence } from './revenue-intelligence'
+import { conversationIntelligenceService, ConversationContext, RealTimeCoaching, ConversationIntelligence, SalesCoachingInsights } from './conversation-intelligence'
+import { visualContentAIService, VisualContentStrategy, ExpansionOpportunity, ImplementationStep } from './visual-content-ai'
 import { proactiveInsightsService, ProactiveInsight, CustomerSatisfactionInsight } from './proactive-insights'
-import { getAccountByName } from './getty-accounts'
+import { getAccountByName, GettyAccount } from './getty-accounts'
 import { BaseService, CompanyContext } from './base-service'
 import { executeParallel } from './utils'
 
@@ -13,19 +14,11 @@ export interface EnhancedCursorJarvisDashboard {
   tier: 1 | 2 | 3
   currentRevenue: number
   growthRate: number
-  voiceInsights: {
-    recentCalls: CallAnalysis[]
-    performanceMetrics: any
-    coachingRecommendations: string[]
-  }
-  revenueIntelligence: {
-    forecast: RevenueForecast
-    optimization: any
-    trends: any[]
-  }
+  voiceInsights: VoiceInsights
+  revenueIntelligence: RevenueIntelligence
   conversationIntelligence: {
     realTimeCoaching: RealTimeCoaching
-    performanceInsights: any
+    performanceInsights: SalesCoachingInsights
   }
   visualContentStrategy: VisualContentStrategy
   proactiveInsights: ProactiveInsight[]
@@ -140,7 +133,7 @@ export class EnhancedCursorJarvisService extends BaseService {
         () => visualContentAIService.generateVisualContentStrategy(accountId),
         () => proactiveInsightsService.generateProactiveInsights(accountId),
         () => proactiveInsightsService.analyzeCustomerSatisfaction(accountId)
-      ])
+      ] as const)
 
       // Generate next actions
       const nextActions = await this.generateNextActionsFromInsights(
@@ -182,8 +175,8 @@ export class EnhancedCursorJarvisService extends BaseService {
 
   async generateAccountExpansionPlan(accountId: string): Promise<{
     strategy: VisualContentStrategy
-    expansionOpportunities: any[]
-    implementationPlan: any[]
+    expansionOpportunities: ExpansionOpportunity[]
+    implementationPlan: ImplementationStep[]
     expectedROI: number
   }> {
     try {
@@ -213,7 +206,7 @@ export class EnhancedCursorJarvisService extends BaseService {
     }
   }
 
-  private async generateCallInsights(analysis: CallAnalysis, gettyAccount: any): Promise<string[]> {
+  private async generateCallInsights(analysis: CallAnalysis, gettyAccount: GettyAccount): Promise<string[]> {
     const insights = []
     
     if (analysis.sentiment === 'positive') {
@@ -235,7 +228,7 @@ export class EnhancedCursorJarvisService extends BaseService {
     return insights
   }
 
-  private async generateNextActions(analysis: CallAnalysis, gettyAccount: any): Promise<NextAction[]> {
+  private async generateNextActions(analysis: CallAnalysis, gettyAccount: GettyAccount): Promise<NextAction[]> {
     const nextActions: NextAction[] = []
     
     // Generate next actions based on call analysis
@@ -258,7 +251,7 @@ export class EnhancedCursorJarvisService extends BaseService {
     return nextActions
   }
 
-  private async identifyRevenueOpportunities(analysis: CallAnalysis, gettyAccount: any): Promise<string[]> {
+  private async identifyRevenueOpportunities(analysis: CallAnalysis, gettyAccount: GettyAccount): Promise<string[]> {
     const opportunities = []
     
     if (analysis.opportunities.includes('account expansion')) {
@@ -276,36 +269,68 @@ export class EnhancedCursorJarvisService extends BaseService {
     return opportunities
   }
 
-  private async getVoiceInsights(accountId: string): Promise<any> {
+  private async getVoiceInsights(accountId: string): Promise<VoiceInsights> {
     // This would fetch voice insights from the database
     return {
-      recentCalls: [],
-      performanceMetrics: {
+      callTrends: {
         averageSentiment: 7.5,
         engagementTrend: 'improving',
-        objectionHandling: 8
+        commonObjections: ['price', 'timing'],
+        successfulPatterns: ['rapport building', 'value demonstration']
       },
-      coachingRecommendations: [
-        'Improve objection handling techniques',
-        'Strengthen value proposition delivery'
-      ]
+      accountHealth: {
+        relationshipStrength: 8.2,
+        revenueRisk: 'low',
+        expansionOpportunities: ['additional services', 'upselling'],
+        competitiveThreats: ['competitor X']
+      },
+      personalPerformance: {
+        objectionHandling: 8.0,
+        rapportBuilding: 8.5,
+        closingEffectiveness: 7.8,
+        followUpConsistency: 9.0
+      }
     }
   }
 
-  private async getRevenueIntelligence(accountId: string): Promise<any> {
+  private async getRevenueIntelligence(accountId: string): Promise<RevenueIntelligence> {
     try {
       return await revenueIntelligenceService.getRevenueDashboard(accountId)
     } catch (error) {
       console.error('Error getting revenue intelligence:', error)
       return {
-        forecast: null,
-        optimization: null,
-        trends: []
+        currentRevenue: 0,
+        growthRate: 0,
+        forecast: {
+          accountId: accountId,
+          currentRevenue: 0,
+          projectedRevenue: {
+            next30Days: 0,
+            next90Days: 0,
+            next6Months: 0,
+            nextYear: 0
+          },
+          confidence: 0,
+          keyDrivers: [],
+          risks: [],
+          opportunities: []
+        },
+        optimization: {
+          accountId: accountId,
+          currentRevenue: 0,
+          potentialRevenue: 0,
+          optimizationStrategies: [],
+          priority: 'low',
+          expectedImpact: 0,
+          timeline: '3-6 months'
+        },
+        trends: [],
+        insights: []
       }
     }
   }
 
-  private async getConversationIntelligence(accountId: string): Promise<any> {
+  private async getConversationIntelligence(accountId: string): Promise<ConversationIntelligence> {
     // This would fetch conversation intelligence data
     return {
       realTimeCoaching: {
@@ -318,7 +343,23 @@ export class EnhancedCursorJarvisService extends BaseService {
       },
       performanceInsights: {
         strengths: ['Rapport building', 'Industry knowledge'],
-        improvementAreas: ['Objection handling', 'Closing techniques']
+        improvementAreas: ['Objection handling', 'Closing techniques'],
+        bestPractices: [],
+        objectionHandling: {
+          score: 0,
+          commonObjections: [],
+          suggestedResponses: {}
+        },
+        closingEffectiveness: {
+          score: 0,
+          successfulPatterns: [],
+          improvementSuggestions: []
+        },
+        rapportBuilding: {
+          score: 0,
+          techniques: [],
+          relationshipHealth: 0
+        }
       }
     }
   }
@@ -326,7 +367,7 @@ export class EnhancedCursorJarvisService extends BaseService {
   private async generateNextActionsFromInsights(
     proactiveInsights: ProactiveInsight[],
     visualContentStrategy: VisualContentStrategy,
-    gettyAccount: any
+    gettyAccount: GettyAccount
   ): Promise<NextAction[]> {
     const nextActions: NextAction[] = []
     

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     for (let i = 1; i < lines.length; i++) {
       try {
         const values = lines[i].split(',').map(v => v.trim())
-        const rowData: any = {}
+        const rowData: Record<string, unknown> = {}
         
         headers.forEach((header, index) => {
           rowData[header.toLowerCase()] = values[index] || ''
@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
         // Check for duplicates
         const existingContact = await db.contact.findFirst({
           where: {
-            email: rowData.email || undefined,
-            linkedinUrl: rowData.linkedinurl || undefined
+            email: String(rowData.email || '') || undefined,
+            linkedinUrl: String(rowData.linkedinurl || '') || undefined
           }
         })
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         let company = await db.company.findFirst({
           where: {
             name: {
-              contains: rowData.company,
+              contains: String(rowData.company),
               mode: 'insensitive'
             }
           }
@@ -61,11 +61,11 @@ export async function POST(request: NextRequest) {
         if (!company) {
           company = await db.company.create({
             data: {
-              name: rowData.company,
-              website: rowData.website || '',
-              subIndustry: rowData.subindustry || 'Tech/SaaS',
-              region: rowData.region || 'Unknown',
-              tags: rowData.tags ? rowData.tags.split(',').map((t: string) => t.trim()) : [],
+              name: String(rowData.company),
+              website: String(rowData.website || ''),
+              subIndustry: String(rowData.subindustry || 'Tech/SaaS'),
+              region: String(rowData.region || 'Unknown'),
+              tags: rowData.tags ? String(rowData.tags).split(',').map((t: string) => t.trim()) : [],
               priorityLevel: 'GROWTH'
             }
           })
@@ -74,13 +74,13 @@ export async function POST(request: NextRequest) {
         // Create contact
         await db.contact.create({
           data: {
-            firstName: rowData.firstname || rowData.name?.split(' ')[0] || '',
-            lastName: rowData.lastname || rowData.name?.split(' ').slice(1).join(' ') || '',
-            email: rowData.email || null,
-            phone: rowData.phone || null,
-            title: rowData.title || '',
-            role: rowData.role || '',
-            linkedinUrl: rowData.linkedinurl || null,
+            firstName: String(rowData.firstname || rowData.name?.toString().split(' ')[0] || ''),
+            lastName: String(rowData.lastname || rowData.name?.toString().split(' ').slice(1).join(' ') || ''),
+            email: String(rowData.email || '') || null,
+            phone: String(rowData.phone || '') || null,
+            title: String(rowData.title || ''),
+            role: String(rowData.role || ''),
+            linkedinUrl: String(rowData.linkedinurl || '') || null,
             companyId: company.id
           }
         })

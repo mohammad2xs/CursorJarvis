@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { subagentService } from '@/lib/subagents'
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const agents = await subagentService.listAvailableSubagents()
   return NextResponse.json({ agents })
 }
 
-export async function POST(req: NextRequest, { params }: { params: { agent: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ agent: string }> }) {
   try {
-    const { agent } = params
+    const { agent } = await params
     const body = await req.json().catch(() => ({}))
     const { task, context, companyId } = body || {}
 
@@ -18,10 +18,9 @@ export async function POST(req: NextRequest, { params }: { params: { agent: stri
 
     const result = await subagentService.invokeSubagent({ agent, task, context, companyId })
     return NextResponse.json(result)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Subagent invoke error:', error)
-    return NextResponse.json({ error: error?.message || 'Failed to invoke subagent' }, { status: 500 })
+    return NextResponse.json({ error: (error as Error)?.message || 'Failed to invoke subagent' }, { status: 500 })
   }
 }
-
 

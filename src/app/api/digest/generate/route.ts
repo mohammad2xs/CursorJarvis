@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { WeeklyDigest } from '@/types'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Get data from the last 7 days
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)

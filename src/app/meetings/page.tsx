@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { SalesIntelligencePro } from '@/components/dashboard/sales-intelligence-pro'
-import { MeetingWithRelations } from '@/types'
+import { MeetingWithRelations, OpportunityWithRelations, CompanyWithRelations } from '@/types'
 
 export default function MeetingsPage() {
   const [meetings, setMeetings] = useState<MeetingWithRelations[]>([])
-  const [opportunities, setOpportunities] = useState<any[]>([])
-  const [companies, setCompanies] = useState<any[]>([])
+  const [opportunities, setOpportunities] = useState<OpportunityWithRelations[]>([])
+  const [companies, setCompanies] = useState<CompanyWithRelations[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -177,13 +177,13 @@ export default function MeetingsPage() {
       }
     ]
 
-    const mockOpportunities = [
+    const mockOpportunities: OpportunityWithRelations[] = [
       {
         id: 'opp_1',
         name: 'Acme Corp - Creative Platform',
-        dealType: 'NEW_LOGO',
-        stage: 'DISCOVER',
-        amount: 50000,
+        dealType: 'NEW_LOGO' as const,
+        stage: 'DISCOVER' as const,
+        value: 50000,
         probability: 25,
         closeDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
         companyId: 'comp_1',
@@ -192,16 +192,24 @@ export default function MeetingsPage() {
         company: {
           id: 'comp_1',
           name: 'Acme Corporation',
+          website: 'https://acme.com',
           subIndustry: 'Tech/SaaS',
-          priorityLevel: 'STRATEGIC'
-        }
+          region: 'San Francisco, CA',
+          tags: ['Innovation/Speed', 'Cost-out'],
+          priorityLevel: 'STRATEGIC' as const,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        activities: [],
+        meetings: [],
+        tasks: []
       },
       {
         id: 'opp_2',
         name: 'TechCorp - Creative Suite',
-        dealType: 'NEW_LOGO',
-        stage: 'EVALUATE',
-        amount: 75000,
+        dealType: 'NEW_LOGO' as const,
+        stage: 'EVALUATE' as const,
+        value: 75000,
         probability: 40,
         closeDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
         companyId: 'comp_2',
@@ -210,16 +218,24 @@ export default function MeetingsPage() {
         company: {
           id: 'comp_2',
           name: 'TechCorp',
+          website: 'https://techcorp.com',
           subIndustry: 'Tech/SaaS',
-          priorityLevel: 'GROWTH'
-        }
+          region: 'Austin, TX',
+          tags: ['Innovation/Speed', 'ESG'],
+          priorityLevel: 'GROWTH' as const,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        activities: [],
+        meetings: [],
+        tasks: []
       },
       {
         id: 'opp_3',
         name: 'Global Industries - Brand Platform',
-        dealType: 'NEW_LOGO',
-        stage: 'PROPOSE',
-        amount: 100000,
+        dealType: 'NEW_LOGO' as const,
+        stage: 'PROPOSE' as const,
+        value: 100000,
         probability: 60,
         closeDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
         companyId: 'comp_3',
@@ -228,36 +244,65 @@ export default function MeetingsPage() {
         company: {
           id: 'comp_3',
           name: 'Global Industries',
+          website: 'https://globalind.com',
           subIndustry: 'Oil & Gas/Energy',
-          priorityLevel: 'GROWTH'
-        }
+          region: 'Houston, TX',
+          tags: ['ESG', 'Safety'],
+          priorityLevel: 'GROWTH' as const,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        activities: [],
+        meetings: [],
+        tasks: []
       }
     ]
 
-    const mockCompanies = [
+    const mockCompanies: CompanyWithRelations[] = [
       {
         id: 'comp_1',
         name: 'Acme Corporation',
+        website: 'https://acme.com',
         subIndustry: 'Tech/SaaS',
-        priorityLevel: 'STRATEGIC',
+        region: 'San Francisco, CA',
+        tags: ['Innovation/Speed', 'Cost-out'],
+        priorityLevel: 'STRATEGIC' as const,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        contacts: [],
+        opportunities: [],
+        accountSignals: [],
+        activities: []
       },
       {
         id: 'comp_2',
         name: 'TechCorp',
+        website: 'https://techcorp.com',
         subIndustry: 'Tech/SaaS',
-        priorityLevel: 'GROWTH',
+        region: 'Austin, TX',
+        tags: ['Innovation/Speed', 'ESG'],
+        priorityLevel: 'GROWTH' as const,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        contacts: [],
+        opportunities: [],
+        accountSignals: [],
+        activities: []
       },
       {
         id: 'comp_3',
         name: 'Global Industries',
+        website: 'https://globalind.com',
         subIndustry: 'Oil & Gas/Energy',
-        priorityLevel: 'GROWTH',
+        region: 'Houston, TX',
+        tags: ['ESG', 'Safety'],
+        priorityLevel: 'GROWTH' as const,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        contacts: [],
+        opportunities: [],
+        accountSignals: [],
+        activities: []
       }
     ]
 
@@ -293,9 +338,9 @@ export default function MeetingsPage() {
     }
   }
 
-  const handleGenerateRecap = async (meetingId: string, notes: string) => {
+  const handleGenerateRecap = async (meetingId: string) => {
     // This will be handled by the MeetingOS component
-    console.log('Generating recap for meeting:', meetingId, 'with notes:', notes)
+    console.log('Generating recap for meeting:', meetingId)
   }
 
   if (loading) {

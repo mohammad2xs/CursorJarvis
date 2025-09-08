@@ -4,7 +4,7 @@ import { brandStudio } from '@/lib/brand-studio'
 
 export async function POST(request: NextRequest) {
   try {
-    const { meetingId, companyId, contactId, opportunityId } = await request.json()
+    const { meetingId } = await request.json()
 
     const meeting = await db.meeting.findUnique({
       where: { id: meetingId },
@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
     // Generate static content without Perplexity API
     const companyName = meeting.company.name
     const subIndustry = meeting.company.subIndustry
-    const contactTitle = meeting.contact?.title || 'decision maker'
 
     // Generate discovery questions
     const discoveryQuestions = brandStudio.generateDiscoveryQuestions(subIndustry)

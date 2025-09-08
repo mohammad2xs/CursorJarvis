@@ -1,0 +1,96 @@
+
+> jarvis-crm@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/muhammad/jarvis-crm/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/muhammad/jarvis-crm/CursorJarvis-1/package-lock.json
+
+   ▲ Next.js 15.5.2 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.174:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.6s
+ ○ Compiling /api/behavioral-learning/simple ...
+ ✓ Compiled /api/behavioral-learning/simple in 4.5s
+ GET /api/behavioral-learning/simple?userId=user-1 200 in 5372ms
+ ✓ Compiled /api/behavioral-learning/analytics in 286ms
+[BehavioralLearningService.TypeError: this.log is not a function] Unknown error getBehaviorAnalytics
+Error fetching behavioral analytics: Error: BehavioralLearningService.TypeError: this.log is not a function: Unknown error
+    at BehavioralLearningService.handleError (src/lib/base-service.ts:292:11)
+    at BehavioralLearningService.getBehaviorAnalytics (src/lib/behavioral-learning.ts:493:12)
+    at GET (src/app/api/behavioral-learning/analytics/route.ts:16:55)
+  290 |     console.error(`[${fullContext}] ${errorMessage}`, error)
+  291 |     
+> 292 |     throw new Error(`${fullContext}: ${errorMessage}`)
+      |           ^
+  293 |   }
+  294 |
+  295 |   /**
+ GET /api/behavioral-learning/analytics?userId=user-1 500 in 998ms
+ GET /api/behavioral-learning/analytics?userId=user-1 200 in 884ms
+ ○ Compiling /api/performance-coaching/dashboard ...
+ ✓ Compiled /api/performance-coaching/dashboard in 579ms
+ GET /api/performance-coaching/dashboard?userId=user-1 200 in 1271ms
+ ○ Compiling /api/dynamic-content/templates ...
+ ✓ Compiled /api/dynamic-content/templates in 568ms
+ GET /api/dynamic-content/templates?userId=user-1 200 in 1040ms
+ ✓ Compiled /api/dynamic-content/generate in 202ms
+ POST /api/dynamic-content/generate 200 in 706ms
+ ○ Compiling /api/competitive-intelligence/dashboard ...
+ ✓ Compiled /api/competitive-intelligence/dashboard in 565ms
+ GET /api/competitive-intelligence/dashboard?userId=user-1 200 in 1701ms
+ ○ Compiling /api/team-collaboration/dashboard ...
+ ✓ Compiled /api/team-collaboration/dashboard in 1077ms
+ GET /api/team-collaboration/dashboard?teamId=team-1&managerId=user-1 200 in 1612ms
+ ✓ Compiled /api/client-communication/hub in 296ms
+ GET /api/client-communication/hub?userId=user-1 200 in 681ms
+ ✓ Compiled /api/social-selling/profiles in 256ms
+ GET /api/social-selling/profiles?userId=user-1 200 in 588ms
+ ✓ Compiled /api/social-selling/campaigns in 248ms
+ GET /api/social-selling/campaigns?userId=user-1 200 in 540ms
+ ✓ Compiled /api/social-selling/insights in 119ms
+ GET /api/social-selling/insights?userId=user-1 200 in 391ms
+ ✓ Compiled /api/performance-analytics/metrics in 184ms
+ GET /api/performance-analytics/metrics?userId=user-1&period=WEEKLY 200 in 520ms
+ ✓ Compiled /api/performance-analytics/goals in 183ms
+ GET /api/performance-analytics/goals?userId=user-1 200 in 454ms
+ ✓ Compiled /api/performance-analytics/alerts in 249ms
+ GET /api/performance-analytics/alerts?userId=user-1 200 in 578ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.mdf53xdrf7'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.mdf53xdrf7'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1670ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.ruel0513559'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.ruel0513559'
+}
+[Error: ENOENT: no such file or directory, open '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.mdf53xdrf7'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.mdf53xdrf7'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.8qhbctvaer3'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.8qhbctvaer3'
+}
+[Error: ENOENT: no such file or directory, open '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.tqzmnnfcfw'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/muhammad/jarvis-crm/CursorJarvis-1/.next/static/development/_buildManifest.js.tmp.tqzmnnfcfw'
+}
+[?25h

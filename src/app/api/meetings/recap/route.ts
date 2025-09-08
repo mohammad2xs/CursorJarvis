@@ -5,7 +5,7 @@ import { TaskType } from '@prisma/client'
 
 export async function POST(request: NextRequest) {
   try {
-    const { meetingId, notes, companyId, contactId, opportunityId } = await request.json()
+    const { meetingId, notes } = await request.json()
 
     const meeting = await db.meeting.findUnique({
       where: { id: meetingId },

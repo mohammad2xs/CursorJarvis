@@ -5,7 +5,6 @@ import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { GettyAccountsComponent } from '@/components/dashboard/getty-accounts'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { callSubagent } from '@/lib/subagents-client'
 
@@ -41,8 +40,8 @@ export default function GettyAccountsPage() {
         companyId: selectedAccount.toLowerCase().replace(/\s+/g, '-')
       })
       setResult(res?.answer || '')
-    } catch (e: any) {
-      setError(e?.message || 'Failed to execute Getty Images agent')
+    } catch (e: unknown) {
+      setError((e as Error)?.message || 'Failed to execute Getty Images agent')
     } finally {
       setLoading(false)
     }

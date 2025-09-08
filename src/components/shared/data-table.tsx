@@ -20,7 +20,7 @@ export interface Column<T> {
   label: string
   sortable?: boolean
   filterable?: boolean
-  render?: (value: any, row: T) => React.ReactNode
+  render?: (value: unknown, row: T) => React.ReactNode
   width?: string
   align?: 'left' | 'center' | 'right'
 }
@@ -46,7 +46,7 @@ export interface DataTableProps<T> {
   className?: string
 }
 
-export function DataTable<T extends Record<string, any>>({
+export function DataTable<T extends Record<string, unknown>>({
   data,
   columns,
   title,

@@ -1,5 +1,6 @@
 import { db } from './db'
 import { openAIService } from './openai'
+import { RevenueTrend } from '@/types'
 
 export interface RevenueAttribution {
   id: string
@@ -61,6 +62,17 @@ export interface GettyImagesRevenueData {
   lastPurchase: Date
   averageOrderValue: number
   purchaseFrequency: number
+}
+
+interface HistoricalRevenueData {
+  month: string
+  revenue: number
+}
+
+interface GettyAccountData {
+  tier: 1 | 2 | 3
+  industry: string
+  growthPotential: 'High' | 'Medium' | 'Low'
 }
 
 export class RevenueIntelligenceService {
@@ -195,7 +207,7 @@ export class RevenueIntelligenceService {
     growthRate: number
     forecast: RevenueForecast
     optimization: RevenueOptimization
-    trends: any[]
+    trends: RevenueTrend[]
     insights: string[]
   }> {
     try {
@@ -220,7 +232,7 @@ export class RevenueIntelligenceService {
     }
   }
 
-  private async getHistoricalRevenueData(accountId: string): Promise<any[]> {
+  private async getHistoricalRevenueData(accountId: string): Promise<HistoricalRevenueData[]> {
     // This would fetch historical revenue data from the database
     // For now, returning mock data
     return [
@@ -245,13 +257,14 @@ export class RevenueIntelligenceService {
     return 0.15 // 15% growth
   }
 
-  private async getRevenueTrends(accountId: string): Promise<any[]> {
+  private async getRevenueTrends(accountId: string): Promise<RevenueTrend[]> {
     // This would fetch revenue trends from the database
-    // For now, returning mock data
+    // For now, returning mock data with required fields
+    const now = new Date()
     return [
-      { period: 'Q1 2024', revenue: 55000, growth: 0.12 },
-      { period: 'Q2 2024', revenue: 72000, growth: 0.31 },
-      { period: 'Q3 2024', revenue: 85000, growth: 0.18 }
+      { id: 'trend-q1-2024', userId: 'system', period: 'Q1 2024', revenue: 55000, growth: 0.12, factors: [], createdAt: now, updatedAt: now },
+      { id: 'trend-q2-2024', userId: 'system', period: 'Q2 2024', revenue: 72000, growth: 0.31, factors: [], createdAt: now, updatedAt: now },
+      { id: 'trend-q3-2024', userId: 'system', period: 'Q3 2024', revenue: 85000, growth: 0.18, factors: [], createdAt: now, updatedAt: now }
     ]
   }
 
@@ -283,7 +296,7 @@ export class RevenueIntelligenceService {
     // Implementation would depend on the database schema
   }
 
-  private async getGettyAccountData(accountId: string): Promise<any> {
+  private async getGettyAccountData(accountId: string): Promise<GettyAccountData> {
     // This would fetch Getty Images-specific account data
     // For now, returning mock data
     return {
@@ -293,7 +306,7 @@ export class RevenueIntelligenceService {
     }
   }
 
-  private parseForecastResponse(response: string, historicalData: any[]): RevenueForecast {
+  private parseForecastResponse(response: string, historicalData: HistoricalRevenueData[]): RevenueForecast {
     // This would parse the AI response and structure it properly
     return {
       accountId: '',
@@ -343,6 +356,15 @@ export class RevenueIntelligenceService {
       'Brand refresh projects could drive significant revenue growth'
     ]
   }
+}
+
+export interface RevenueIntelligence {
+  currentRevenue: number
+  growthRate: number
+  forecast: RevenueForecast
+  optimization: RevenueOptimization
+  trends: RevenueTrend[]
+  insights: string[]
 }
 
 export const revenueIntelligenceService = new RevenueIntelligenceService()

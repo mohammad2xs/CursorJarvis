@@ -123,7 +123,7 @@ export class VoiceAnalysisService {
     }
   }
 
-  async generateRealTimeCoaching(transcript: string, context: any): Promise<string[]> {
+  async generateRealTimeCoaching(transcript: string, context: Record<string, unknown>): Promise<string[]> {
     try {
       const coachingPrompt = `
         Provide real-time sales coaching for this ongoing call transcript.

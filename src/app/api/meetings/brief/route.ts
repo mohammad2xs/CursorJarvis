@@ -5,7 +5,7 @@ import { brandStudio } from '@/lib/brand-studio'
 
 export async function POST(request: NextRequest) {
   try {
-    const { meetingId, companyId, contactId, opportunityId } = await request.json()
+    const { meetingId } = await request.json()
 
     const meeting = await db.meeting.findUnique({
       where: { id: meetingId },

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { enhancedCursorJarvisService } from '@/lib/enhanced-cursor-jarvis'
 import { APIHandler } from '@/lib/api-handler'
 

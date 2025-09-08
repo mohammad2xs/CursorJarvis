@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
   try {
-    const { companyId, triggerType } = await req.json()
+    const { companyId } = await req.json()
 
     if (!companyId) {
       return NextResponse.json({ error: 'Company ID is required' }, { status: 400 })
@@ -82,10 +82,10 @@ export async function POST(req: NextRequest) {
       }))
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Auto-subagent processing error:', error)
     return NextResponse.json({ 
-      error: error?.message || 'Failed to process auto-subagents' 
+      error: (error as Error)?.message || 'Failed to process auto-subagents' 
     }, { status: 500 })
   }
 }

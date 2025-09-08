@@ -1,5 +1,5 @@
 import { openAIService } from './openai'
-import { GETTY_ACCOUNTS, getAccountByName } from './getty-accounts'
+import { GETTY_ACCOUNTS, getAccountByName, GettyAccount } from './getty-accounts'
 
 export interface VisualContentStrategy {
   accountId: string
@@ -262,7 +262,7 @@ export class VisualContentAIService {
     }
   }
 
-  private parseStrategyResponse(response: string, gettyAccount: any): VisualContentStrategy {
+  private parseStrategyResponse(response: string, gettyAccount: GettyAccount): VisualContentStrategy {
     // This would parse the AI response and structure it properly
     return {
       accountId: gettyAccount.name,
@@ -336,7 +336,7 @@ export class VisualContentAIService {
     }
   }
 
-  private parseBrandAnalysisResponse(response: string, gettyAccount: any): BrandAlignmentAnalysis {
+  private parseBrandAnalysisResponse(response: string, gettyAccount: GettyAccount): BrandAlignmentAnalysis {
     // This would parse the AI response and structure it properly
     return {
       accountId: gettyAccount.name,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -312,7 +312,7 @@ export function SalesIntelligencePro({
         response = `I can help you prepare for your upcoming meetings. You have ${meetings.length} meetings scheduled. Would you like me to generate a brief for any specific meeting?`
         type = 'brief'
       } else if (message.toLowerCase().includes('deal') || message.toLowerCase().includes('pipeline')) {
-        response = `Your pipeline shows ${opportunities.length} opportunities with a total value of $${opportunities.reduce((sum, opp) => sum + (opp.amount || 0), 0).toLocaleString()}. ${opportunities.filter(o => o.stage === 'CLOSE_WON').length} deals have been won this quarter.`
+        response = `Your pipeline shows ${opportunities.length} opportunities with a total value of $${opportunities.reduce((sum, opp) => sum + (opp.value || 0), 0).toLocaleString()}. ${opportunities.filter(o => o.stage === 'CLOSE_WON').length} deals have been won this quarter.`
         type = 'analysis'
       } else {
         response = `I'm your AI sales assistant. I can help you with:\n- Next Best Actions and recommendations\n- Meeting preparation and briefs\n- Pipeline analysis and deal insights\n- Brand messaging and content generation\n- Account research and intelligence\n\nWhat would you like to work on?`
@@ -349,7 +349,7 @@ export function SalesIntelligencePro({
     }, 1000)
     
     // Store interval for cleanup
-    ;(window as any).recordingInterval = interval
+    ;(window as unknown as { recordingInterval: NodeJS.Timeout }).recordingInterval = interval
   }
 
   const pauseRecording = () => {
@@ -358,8 +358,8 @@ export function SalesIntelligencePro({
 
   const stopRecording = () => {
     setRecording(prev => ({ ...prev, isRecording: false, isPaused: false }))
-    if ((window as any).recordingInterval) {
-      clearInterval((window as any).recordingInterval)
+    if ((window as unknown as { recordingInterval: NodeJS.Timeout }).recordingInterval) {
+      clearInterval((window as unknown as { recordingInterval: NodeJS.Timeout }).recordingInterval)
     }
     
     // Simulate transcript generation
@@ -600,7 +600,7 @@ export function SalesIntelligencePro({
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-white mb-1">
-                      ${opportunities.reduce((sum, opp) => sum + (opp.amount || 0), 0).toLocaleString()}
+                      ${opportunities.reduce((sum, opp) => sum + (opp.value || 0), 0).toLocaleString()}
                     </div>
                     <p className="text-sm text-green-400 font-medium">
                       +8% from last month
@@ -877,7 +877,7 @@ export function SalesIntelligencePro({
                           {opp.stage}
                         </Badge>
                         <span className="text-sm font-medium text-green-600">
-                          ${opp.amount?.toLocaleString()}
+                          ${opp.value?.toLocaleString()}
                         </span>
                       </div>
                       <CardTitle className="text-lg">{opp.name}</CardTitle>

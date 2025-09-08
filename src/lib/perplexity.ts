@@ -51,7 +51,7 @@ export class PerplexityService {
 
       const result: PerplexityResponse = {
         answer: response.data.choices[0].message.content,
-        sources: response.data.citations?.map((citation: any) => ({
+        sources: response.data.citations?.map((citation: Record<string, unknown>) => ({
           title: citation.title || 'Source',
           url: citation.url || '',
           snippet: citation.snippet || ''

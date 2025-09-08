@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export interface APIError {
   message: string
   code?: string
-  details?: any
+  details?: Record<string, unknown>
 }
 
 export class APIHandler {
@@ -23,7 +23,7 @@ export class APIHandler {
       const apiError: APIError = {
         message: errorMessage,
         code: 'INTERNAL_ERROR',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        details: process.env.NODE_ENV === 'development' ? (error as Record<string, unknown>) : undefined
       }
       
       return NextResponse.json(
@@ -50,7 +50,7 @@ export class APIHandler {
       const apiError: APIError = {
         message: errorMessage,
         code: this.getErrorCode(statusCode),
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        details: process.env.NODE_ENV === 'development' ? (error as Record<string, unknown>) : undefined
       }
       
       return NextResponse.json(
@@ -64,7 +64,7 @@ export class APIHandler {
    * Validates required parameters and returns standardized error response
    */
   static validateRequiredParams(
-    params: Record<string, any>,
+    params: Record<string, unknown>,
     requiredFields: string[]
   ): NextResponse | null {
     const missingFields = requiredFields.filter(field => 
@@ -91,7 +91,7 @@ export class APIHandler {
    * Validates request body and returns standardized error response
    */
   static validateRequestBody(
-    body: any,
+    body: unknown,
     requiredFields: string[]
   ): NextResponse | null {
     if (!body || typeof body !== 'object') {
@@ -106,7 +106,7 @@ export class APIHandler {
       )
     }
 
-    return this.validateRequiredParams(body, requiredFields)
+    return this.validateRequiredParams(body as Record<string, unknown>, requiredFields)
   }
 
   /**
@@ -179,7 +179,7 @@ export class APIHandler {
   /**
    * Parses JSON request body with error handling
    */
-  static async parseRequestBody(request: NextRequest): Promise<any> {
+  static async parseRequestBody(request: NextRequest): Promise<Record<string, unknown>> {
     try {
       return await request.json()
     } catch (error) {
@@ -221,7 +221,7 @@ export class APIHandler {
 /**
  * Higher-order function to wrap API route handlers with error handling
  */
-export function withErrorHandling<T extends any[]>(
+export function withErrorHandling<T extends unknown[]>(
   handler: (...args: T) => Promise<NextResponse>
 ) {
   return async (...args: T): Promise<NextResponse> => {
@@ -233,7 +233,7 @@ export function withErrorHandling<T extends any[]>(
       const apiError: APIError = {
         message: 'An unexpected error occurred',
         code: 'INTERNAL_ERROR',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        details: process.env.NODE_ENV === 'development' ? (error as Record<string, unknown>) : undefined
       }
       
       return NextResponse.json(

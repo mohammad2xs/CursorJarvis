@@ -4,11 +4,11 @@ import { NBAStatus } from '@prisma/client'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { status, outcome } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     if (!status || !Object.values(NBAStatus).includes(status)) {
       return NextResponse.json(
@@ -39,10 +39,10 @@ export async function PATCH(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const nba = await db.nBA.findUnique({
       where: { id },

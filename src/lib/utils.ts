@@ -56,6 +56,89 @@ export function getPriorityColor(priority: number) {
   }
 }
 
+export function getEnergyColor(energyLevel: number | string) {
+  if (typeof energyLevel === 'string') {
+    switch (energyLevel.toUpperCase()) {
+      case 'HIGH':
+        return "text-green-600 bg-green-50"
+      case 'MEDIUM':
+        return "text-blue-600 bg-blue-50"
+      case 'LOW':
+        return "text-yellow-600 bg-yellow-50"
+      default:
+        return "text-gray-600 bg-gray-50"
+    }
+  }
+  
+  switch (energyLevel) {
+    case 5:
+      return "text-green-600 bg-green-50"
+    case 4:
+      return "text-blue-600 bg-blue-50"
+    case 3:
+      return "text-yellow-600 bg-yellow-50"
+    case 2:
+      return "text-orange-600 bg-orange-50"
+    case 1:
+      return "text-red-600 bg-red-50"
+    default:
+      return "text-gray-600 bg-gray-50"
+  }
+}
+
+export function getEnergyIcon(energyLevel: number | string) {
+  if (typeof energyLevel === 'string') {
+    switch (energyLevel.toUpperCase()) {
+      case 'HIGH':
+        return "⚡"
+      case 'MEDIUM':
+        return "🔥"
+      case 'LOW':
+        return "😴"
+      default:
+        return "❓"
+    }
+  }
+  
+  switch (energyLevel) {
+    case 5:
+      return "⚡"
+    case 4:
+      return "🔥"
+    case 3:
+      return "💪"
+    case 2:
+      return "😴"
+    case 1:
+      return "😵"
+    default:
+      return "❓"
+  }
+}
+
+export function getTypeIcon(type: string) {
+  switch (type.toUpperCase()) {
+    case 'MEETING':
+      return "📅"
+    case 'TASK':
+      return "✅"
+    case 'CALL':
+      return "📞"
+    case 'EMAIL':
+      return "📧"
+    case 'RESEARCH':
+      return "🔍"
+    case 'FOLLOW_UP':
+      return "🔄"
+    case 'DEMO':
+      return "🎯"
+    case 'PROPOSAL':
+      return "📋"
+    default:
+      return "📝"
+  }
+}
+
 export function getStageColor(stage: string) {
   switch (stage) {
     case "DISCOVER":
@@ -140,12 +223,14 @@ export function getRelativeTime(date: Date | string) {
 
 /**
  * Execute multiple operations in parallel with error handling
+ * Preserves tuple types so heterogeneous results keep order-specific types.
  */
-export async function executeParallel<T>(
-  operations: (() => Promise<T>)[]
-): Promise<T[]> {
+export async function executeParallel<T extends readonly (() => Promise<unknown>)[]>(
+  operations: T
+): Promise<{ [K in keyof T]: T[K] extends () => Promise<infer R> ? R : never }> {
   try {
-    return await Promise.all(operations.map(op => op()))
+    const results = await Promise.all(operations.map(op => op()))
+    return results as unknown as { [K in keyof T]: T[K] extends () => Promise<infer R> ? R : never }
   } catch (error) {
     console.error('Error in parallel execution:', error)
     throw error

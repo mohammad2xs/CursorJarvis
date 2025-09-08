@@ -9,6 +9,22 @@ import { CheckCircle, Clock, AlertCircle, TrendingUp, Users, Calendar, Target } 
 import { NBA, NBAStatus } from '@/types'
 import { formatDateTime, getRelativeTime, getPriorityColor } from '@/lib/utils'
 
+interface Task {
+  id: string
+  title: string
+  dueDate: Date
+  type: string
+}
+
+interface Account {
+  id: string
+  name: string
+  subIndustry: string
+  momentum: string
+  recentSignals: number
+  lastActivity: Date
+}
+
 interface MyWorkProps {
   nbas: NBA[]
   onUpdateNBA: (nbaId: string, status: NBAStatus, outcome?: string) => void
@@ -16,9 +32,9 @@ interface MyWorkProps {
 
 export function MyWork({ nbas, onUpdateNBA }: MyWorkProps) {
   const [topNBAs, setTopNBAs] = useState<NBA[]>([])
-  const [dueTasks, setDueTasks] = useState<any[]>([])
-  const [overdueTasks, setOverdueTasks] = useState<any[]>([])
-  const [spotlightAccounts, setSpotlightAccounts] = useState<any[]>([])
+  const [dueTasks, setDueTasks] = useState<Task[]>([])
+  const [overdueTasks, setOverdueTasks] = useState<Task[]>([])
+  const [spotlightAccounts, setSpotlightAccounts] = useState<Account[]>([])
 
   useEffect(() => {
     // Get top 5 NBAs by priority

@@ -1,7 +1,7 @@
 import { subagentService } from './subagents'
 import { perplexityService } from './perplexity'
 import { db } from './db'
-import { Company, Contact, Opportunity, Meeting } from '@/types'
+import { Company, Contact, Opportunity, Meeting, AccountSignal, Activity } from '@/types'
 import { GETTY_ACCOUNTS, getAccountByName, GETTY_VISUAL_CONTENT_CATEGORIES } from './getty-accounts'
 
 export interface AutoSubagentContext {
@@ -9,8 +9,8 @@ export interface AutoSubagentContext {
   contact?: Contact
   opportunity?: Opportunity
   meeting?: Meeting
-  recentSignals?: any[]
-  recentActivities?: any[]
+  recentSignals?: AccountSignal[]
+  recentActivities?: Activity[]
 }
 
 export interface AutoSubagentResult {

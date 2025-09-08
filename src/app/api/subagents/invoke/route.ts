@@ -51,7 +51,7 @@ function buildPrompt(subagentPrompt: string, task: string, context?: string): st
 export async function POST(request: NextRequest) {
   try {
     const params: SubagentInvokeParams = await request.json()
-    const { agent, task, context, companyId } = params
+    const { agent, task, context } = params
 
     // Check if subagents directory exists
     const repoRoot = process.cwd()

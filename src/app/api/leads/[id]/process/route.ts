@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { ActivityType } from '@/lib/constants'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { action } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const contact = await db.contact.findUnique({
       where: { id },
@@ -22,7 +23,7 @@ export async function POST(
     }
 
     // Create activity based on action
-    let activityType = 'OUTREACH'
+    let activityType: ActivityType = 'OUTREACH'
     let activityTitle = ''
     let activityDescription = ''
 
@@ -58,7 +59,7 @@ export async function POST(
     // Create activity record
     await db.activity.create({
       data: {
-        type: activityType as any,
+        type: activityType,
         title: activityTitle,
         description: activityDescription,
         companyId: contact.companyId,

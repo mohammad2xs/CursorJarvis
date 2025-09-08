@@ -1,6 +1,6 @@
 import { openAIService } from './openai'
 import { db } from './db'
-import { getAccountByName } from './getty-accounts'
+import { getAccountByName, GettyAccount } from './getty-accounts'
 
 export interface ProactiveInsight {
   id: string
@@ -317,7 +317,7 @@ export class ProactiveInsightsService {
     }
   }
 
-  private parseOptimizationResponse(response: string, gettyAccount: any): RevenueOptimizationInsight {
+  private parseOptimizationResponse(response: string, gettyAccount: GettyAccount): RevenueOptimizationInsight {
     // This would parse the AI response and structure it properly
     return {
       accountId: gettyAccount.name,

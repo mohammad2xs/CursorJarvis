@@ -66,6 +66,11 @@ export interface SalesCoachingInsights {
   }
 }
 
+export interface ConversationIntelligence {
+  realTimeCoaching: RealTimeCoaching
+  performanceInsights: SalesCoachingInsights
+}
+
 export class ConversationIntelligenceService {
   async analyzeConversation(
     transcript: string, 

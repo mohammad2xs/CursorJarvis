@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState, useEffect, memo, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { VoiceCall, VoiceMetrics, RevenueForecast, RevenueOptimization, RevenueTrend, ConversationCoaching, ConversationInsights, VisualContentStrategy, ProactiveInsight, CustomerSatisfaction, NextAction } from '@/types'
 import { 
   Phone, 
   DollarSign, 
@@ -13,7 +14,6 @@ import {
   Users, 
   Target, 
   AlertTriangle,
-  CheckCircle,
   Clock,
   BarChart3,
   MessageSquare,
@@ -28,23 +28,23 @@ interface EnhancedCursorJarvisDashboard {
   currentRevenue: number
   growthRate: number
   voiceInsights: {
-    recentCalls: any[]
-    performanceMetrics: any
+    recentCalls: VoiceCall[]
+    performanceMetrics: VoiceMetrics
     coachingRecommendations: string[]
   }
   revenueIntelligence: {
-    forecast: any
-    optimization: any
-    trends: any[]
+    forecast: RevenueForecast
+    optimization: RevenueOptimization
+    trends: RevenueTrend[]
   }
   conversationIntelligence: {
-    realTimeCoaching: any
-    performanceInsights: any
+    realTimeCoaching: ConversationCoaching
+    performanceInsights: ConversationInsights
   }
-  visualContentStrategy: any
-  proactiveInsights: any[]
-  customerSatisfaction: any
-  nextActions: any[]
+  visualContentStrategy: VisualContentStrategy
+  proactiveInsights: ProactiveInsight[]
+  customerSatisfaction: CustomerSatisfaction
+  nextActions: NextAction[]
 }
 
 interface EnhancedJarvisDashboardProps {
@@ -141,7 +141,7 @@ const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProp
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboard.voiceInsights.performanceMetrics.averageSentiment}/10
+              {dashboard.voiceInsights.performanceMetrics.sentimentScore}/10
             </div>
             <p className="text-xs text-muted-foreground">
               Average sentiment
@@ -156,7 +156,7 @@ const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProp
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboard.customerSatisfaction.satisfactionScore}/10
+              {dashboard.customerSatisfaction.score}/10
             </div>
             <p className="text-xs text-muted-foreground">
               Customer satisfaction
@@ -205,23 +205,23 @@ const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProp
                 {dashboard.nextActions.slice(0, 5).map((action, index) => (
                   <div key={index} className="flex items-start space-x-3 p-3 border rounded-lg">
                     <div className="flex-shrink-0">
-                      {action.type === 'call' && <Phone className="h-4 w-4 text-blue-500" />}
-                      {action.type === 'email' && <MessageSquare className="h-4 w-4 text-green-500" />}
-                      {action.type === 'meeting' && <Users className="h-4 w-4 text-purple-500" />}
-                      {action.type === 'proposal' && <BarChart3 className="h-4 w-4 text-orange-500" />}
-                      {action.type === 'follow_up' && <Clock className="h-4 w-4 text-gray-500" />}
+                      {action.type === 'CALL' && <Phone className="h-4 w-4 text-blue-500" />}
+                      {action.type === 'EMAIL' && <MessageSquare className="h-4 w-4 text-green-500" />}
+                      {action.type === 'MEETING' && <Users className="h-4 w-4 text-purple-500" />}
+                      {action.type === 'TASK' && <BarChart3 className="h-4 w-4 text-orange-500" />}
+                      {action.type === 'FOLLOW_UP' && <Clock className="h-4 w-4 text-gray-500" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
                         <h4 className="text-sm font-medium">{action.title}</h4>
-                        <Badge variant={action.priority === 'high' ? 'destructive' : action.priority === 'medium' ? 'default' : 'secondary'}>
+                        <Badge variant={action.priority === 'HIGH' ? 'destructive' : action.priority === 'MEDIUM' ? 'default' : 'secondary'}>
                           {action.priority}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">{action.description}</p>
                       <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                         <span>Due: {new Date(action.dueDate).toLocaleDateString()}</span>
-                        <span>Impact: {formatCurrency(action.revenueImpact)}</span>
+                        <span>Status: {action.status}</span>
                       </div>
                     </div>
                   </div>
@@ -244,23 +244,21 @@ const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProp
                 {dashboard.proactiveInsights.slice(0, 5).map((insight, index) => (
                   <div key={index} className="flex items-start space-x-3 p-3 border rounded-lg">
                     <div className="flex-shrink-0">
-                      {insight.type === 'revenue_opportunity' && <TrendingUp className="h-4 w-4 text-green-500" />}
-                      {insight.type === 'risk_alert' && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                      {insight.type === 'competitive_threat' && <Eye className="h-4 w-4 text-orange-500" />}
-                      {insight.type === 'expansion_opportunity' && <Users className="h-4 w-4 text-blue-500" />}
-                      {insight.type === 'customer_satisfaction' && <CheckCircle className="h-4 w-4 text-purple-500" />}
+                      {insight.type === 'OPPORTUNITY' && <TrendingUp className="h-4 w-4 text-green-500" />}
+                      {insight.type === 'RISK' && <AlertTriangle className="h-4 w-4 text-red-500" />}
+                      {insight.type === 'TREND' && <Eye className="h-4 w-4 text-orange-500" />}
+                      {insight.type === 'RECOMMENDATION' && <Users className="h-4 w-4 text-blue-500" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
                         <h4 className="text-sm font-medium">{insight.title}</h4>
-                        <Badge variant={insight.priority === 'high' ? 'destructive' : insight.priority === 'medium' ? 'default' : 'secondary'}>
+                        <Badge variant={insight.priority === 'HIGH' ? 'destructive' : insight.priority === 'MEDIUM' ? 'default' : 'secondary'}>
                           {insight.priority}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
                       <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                        <span>Confidence: {insight.confidence}/10</span>
-                        <span>Impact: {insight.expectedImpact}</span>
+                        <span>Action Required: {insight.actionRequired ? 'Yes' : 'No'}</span>
                       </div>
                     </div>
                   </div>
@@ -284,22 +282,22 @@ const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProp
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Average Sentiment</span>
-                    <span>{dashboard.voiceInsights.performanceMetrics.averageSentiment}/10</span>
+                    <span>{dashboard.voiceInsights.performanceMetrics.sentimentScore}/10</span>
                   </div>
-                  <Progress value={dashboard.voiceInsights.performanceMetrics.averageSentiment * 10} className="h-2" />
+                  <Progress value={dashboard.voiceInsights.performanceMetrics.sentimentScore * 10} className="h-2" />
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Engagement Trend</span>
-                    <span className="capitalize">{dashboard.voiceInsights.performanceMetrics.engagementTrend}</span>
+                    <span className="capitalize">Stable</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Objection Handling</span>
-                    <span>{dashboard.voiceInsights.performanceMetrics.objectionHandling}/10</span>
+                    <span>{dashboard.voiceInsights.performanceMetrics.qualityScore}/10</span>
                   </div>
-                  <Progress value={dashboard.voiceInsights.performanceMetrics.objectionHandling * 10} className="h-2" />
+                  <Progress value={dashboard.voiceInsights.performanceMetrics.qualityScore * 10} className="h-2" />
                 </div>
               </CardContent>
             </Card>
@@ -359,15 +357,14 @@ const EnhancedJarvisDashboard = memo(({ accountId }: EnhancedJarvisDashboardProp
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h4 className="font-medium">{insight.title}</h4>
-                          <Badge variant={insight.priority === 'high' ? 'destructive' : insight.priority === 'medium' ? 'default' : 'secondary'}>
+                          <Badge variant={insight.priority === 'HIGH' ? 'destructive' : insight.priority === 'MEDIUM' ? 'default' : 'secondary'}>
                             {insight.priority}
                           </Badge>
                         </div>
                         <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
                           <span>Type: {insight.type.replace('_', ' ')}</span>
-                          <span>Confidence: {insight.confidence}/10</span>
-                          <span>Impact: {insight.expectedImpact}</span>
+                          <span>Action Required: {insight.actionRequired ? 'Yes' : 'No'}</span>
                         </div>
                       </div>
                       <Button size="sm" variant="outline">

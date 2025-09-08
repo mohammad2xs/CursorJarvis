@@ -218,3 +218,182 @@ export interface PhantomBusterWebhookData {
     email?: string
   }>
 }
+
+export interface RiskFactor {
+  id: string
+  opportunityId: string
+  type: 'TECHNICAL' | 'FINANCIAL' | 'COMPETITIVE' | 'TIMING' | 'STAKEHOLDER' | 'RESOURCE'
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  description: string
+  impact: string
+  mitigation: string
+  probability: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface RiskAnalysis {
+  opportunity: OpportunityWithRelations
+  riskScore: number
+  riskFactors: string[]
+  daysSinceUpdate: number
+  daysToClose: number
+}
+
+export interface MutualActionPlan {
+  id: string
+  opportunityId: string
+  title: string
+  description: string
+  owner: 'US' | 'THEM' | 'BOTH'
+  dueDate: Date
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE'
+  priority: 'LOW' | 'MEDIUM' | 'HIGH'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface DealStage {
+  stage: string
+  actions: string[]
+}
+
+export interface DealPlaybook {
+  opportunity: OpportunityWithRelations
+  playbook: Record<string, unknown>
+  currentStage: DealStage | undefined
+  nextActions: string[]
+  timeline: number
+  successMetrics: string[]
+}
+
+export interface VoiceCall {
+  id: string
+  userId: string
+  contactId: string
+  duration: number
+  timestamp: Date
+  sentiment: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE'
+  topics: string[]
+  actionItems: string[]
+  quality: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface VoiceMetrics {
+  totalCalls: number
+  averageDuration: number
+  sentimentScore: number
+  qualityScore: number
+  topTopics: Array<{ topic: string; count: number }>
+  improvementAreas: string[]
+}
+
+export interface RevenueForecast {
+  id: string
+  userId: string
+  period: string
+  forecastedRevenue: number
+  confidence: number
+  factors: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface RevenueOptimization {
+  id: string
+  userId: string
+  opportunity: string
+  currentValue: number
+  optimizedValue: number
+  recommendations: string[]
+  impact: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface RevenueTrend {
+  id: string
+  userId: string
+  period: string
+  revenue: number
+  growth: number
+  factors: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ConversationCoaching {
+  id: string
+  userId: string
+  sessionId: string
+  recommendations: string[]
+  realTimeTips: string[]
+  performanceScore: number
+  improvementAreas: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ConversationInsights {
+  id: string
+  userId: string
+  sessionId: string
+  sentiment: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE'
+  topics: string[]
+  engagement: number
+  outcomes: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface VisualContentStrategy {
+  id: string
+  userId: string
+  campaignId: string
+  visualElements: string[]
+  colorScheme: string[]
+  typography: string[]
+  layout: string
+  performance: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ProactiveInsight {
+  id: string
+  userId: string
+  type: 'OPPORTUNITY' | 'RISK' | 'TREND' | 'RECOMMENDATION'
+  title: string
+  description: string
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  actionRequired: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CustomerSatisfaction {
+  id: string
+  userId: string
+  contactId: string
+  score: number
+  feedback: string
+  factors: string[]
+  improvementAreas: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface NextAction {
+  id: string
+  userId: string
+  type: 'CALL' | 'EMAIL' | 'MEETING' | 'TASK' | 'FOLLOW_UP'
+  title: string
+  description: string
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+  dueDate: Date
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE'
+  createdAt: Date
+  updatedAt: Date
+}

@@ -6,20 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
-import { 
-  Target, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  TrendingUp,
-  DollarSign,
-  Calendar,
-  Users,
-  FileText,
-  BarChart3,
-  Zap
-} from 'lucide-react'
-import { Opportunity, OpportunityWithRelations } from '@/types'
+import { Target, AlertTriangle, CheckCircle, TrendingUp, DollarSign, Calendar, Users, FileText, BarChart3, Zap } from 'lucide-react'
+import { Opportunity, OpportunityWithRelations, RiskAnalysis, DealPlaybook } from '@/types'
 import { formatDate, formatCurrency, getStageColor, getDealTypeColor, calculateDaysSince } from '@/lib/utils'
 
 interface DealOSProps {
@@ -28,9 +16,9 @@ interface DealOSProps {
   onGeneratePlaybook: (oppId: string, dealType: string) => void
 }
 
-export function DealOS({ opportunities, onUpdateOpportunity, onGeneratePlaybook }: DealOSProps) {
-  const [riskRadar, setRiskRadar] = useState<any[]>([])
-  const [mutualActionPlans, setMutualActionPlans] = useState<Map<string, any>>(new Map())
+export function DealOS({ opportunities, onUpdateOpportunity: _onUpdateOpportunity, onGeneratePlaybook: _onGeneratePlaybook }: DealOSProps) {
+  const [riskRadar, setRiskRadar] = useState<RiskAnalysis[]>([])
+  const [mutualActionPlans, setMutualActionPlans] = useState<Map<string, DealPlaybook>>(new Map())
   const [selectedOpportunity, setSelectedOpportunity] = useState<OpportunityWithRelations | null>(null)
 
   useEffect(() => {
@@ -80,6 +68,7 @@ export function DealOS({ opportunities, onUpdateOpportunity, onGeneratePlaybook 
     if (score >= 3) return 'text-orange-600 bg-orange-50'
     return 'text-yellow-600 bg-yellow-50'
   }
+
 
   const getDealTypePlaybook = (dealType: string) => {
     const playbooks = {

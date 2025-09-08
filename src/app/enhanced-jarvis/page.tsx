@@ -5,23 +5,7 @@ import { EnhancedJarvisDashboard } from '@/components/dashboard/enhanced-jarvis-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Phone, 
-  DollarSign, 
-  TrendingUp, 
-  Users, 
-  Target, 
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  BarChart3,
-  MessageSquare,
-  Eye,
-  Lightbulb,
-  Mic,
-  Brain,
-  Zap
-} from 'lucide-react'
+import { DollarSign, Eye, Mic, Brain, Zap, CheckCircle, TrendingUp, Target } from 'lucide-react'
 
 const mockAccounts = [
   { id: 'boeing', name: 'Boeing', tier: 1, revenue: 150000, growth: 0.15 },
