@@ -5,8 +5,8 @@
  - Merges with process.env
  - Warns if keys are missing; optionally fails if ENV_CHECK_STRICT=true
 */
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 
 const REQUIRED = ['OPENAI_API_KEY', 'PERPLEXITY_API_KEY', 'ELEVENLABS_API_KEY']
 const STRICT = process.env.ENV_CHECK_STRICT === 'true'
@@ -62,4 +62,3 @@ console.log(
   `PERPLEXITY_API_KEY:${summarize('PERPLEXITY_API_KEY')} ` +
   `ELEVENLABS_API_KEY:${summarize('ELEVENLABS_API_KEY')}`
 )
-

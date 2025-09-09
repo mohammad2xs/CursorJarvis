@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +28,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Initialize theme early to avoid FOUC */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
+            try {
+              const t = localStorage.getItem('theme');
+              const dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+              if (dark) document.documentElement.classList.add('dark');
+            } catch (e) {}
+          `}
+        </Script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeToggle />
+        <Toaster richColors closeButton />
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

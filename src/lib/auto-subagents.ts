@@ -1,8 +1,8 @@
-import { subagentService } from './subagents'
+import { invokeSubagentServer } from './subagent-exec'
 import { perplexityService } from './perplexity'
 import { db } from './db'
 import { Company, Contact, Opportunity, Meeting, AccountSignal, Activity } from '@/types'
-import { GETTY_ACCOUNTS, getAccountByName, GETTY_VISUAL_CONTENT_CATEGORIES } from './getty-accounts'
+import { getAccountByName } from './getty-accounts'
 
 export interface AutoSubagentContext {
   company: Company
@@ -23,20 +23,6 @@ export interface AutoSubagentResult {
 }
 
 export class AutoSubagentOrchestrator {
-  private readonly SALES_AGENTS = [
-    'getty-images-executive', // Primary Getty Images sales agent
-    'sales-executive',        // General sales agent
-    'ui-ux-designer',         // For customer-centric messaging
-    'api-documentor',         // For structured briefs
-    'python-pro',             // For data analysis
-    'typescript-expert'       // For technical positioning
-  ]
-
-  private readonly FORTUNE_1000_INDUSTRIES = [
-    'Energy', 'Oil & Gas', 'Industrial', 'Aerospace', 'Defense', 
-    'Manufacturing', 'Utilities', 'Mining', 'Chemicals'
-  ]
-
   private readonly EXECUTIVE_PERSONAS = [
     'CMO', 'VP Marketing', 'VP Communications', 'ESG Leader', 
     'Brand Leader', 'Sr Director Marketing', 'Chief Marketing Officer',
@@ -110,7 +96,7 @@ Company Context: ${context.company.priorityLevel} priority`
       const gettyAccount = getAccountByName(context.company.name)
       const agent = gettyAccount ? 'getty-images-executive' : 'sales-executive'
       
-      const briefResult = await subagentService.invokeSubagent({
+      const briefResult = await invokeSubagentServer({
         agent,
         task: briefTask,
         context: `Role: ${context.contact.role}, Industry: ${context.company.subIndustry}${gettyAccount ? `, Getty Tier ${gettyAccount.tier}` : ''}`,
@@ -149,7 +135,7 @@ Include:
 Context: ${context.company.subIndustry} industry, ${context.contact.role} role`
 
     try {
-      const followupResult = await subagentService.invokeSubagent({
+      const followupResult = await invokeSubagentServer({
         agent: 'sales-executive',
         task: followupTask,
         context: `Meeting completed recently, need immediate follow-up`,
@@ -189,7 +175,7 @@ Provide:
 Deal Context: ${context.opportunity.stage} stage, $${context.opportunity.value} value`
 
     try {
-      const analysisResult = await subagentService.invokeSubagent({
+      const analysisResult = await invokeSubagentServer({
         agent: 'sales-executive',
         task: analysisTask,
         context: `New opportunity analysis needed`,
@@ -236,7 +222,7 @@ Focus on:
 Target personas: ${this.EXECUTIVE_PERSONAS.join(', ')}`
 
     try {
-      const intelResult = await subagentService.invokeSubagent({
+      const intelResult = await invokeSubagentServer({
         agent: 'sales-executive',
         task: intelTask,
         context: `Fortune 1000 ${context.company.subIndustry} company intelligence`,
@@ -283,7 +269,7 @@ Include:
 Industry: ${context.company.subIndustry}, Company Size: Fortune 1000`
 
     try {
-      const engagementResult = await subagentService.invokeSubagent({
+      const engagementResult = await invokeSubagentServer({
         agent: 'sales-executive',
         task: engagementTask,
         context: `Executive engagement for ${context.contact.role}`,
@@ -335,7 +321,7 @@ Provide:
 Focus on immediate revenue impact and long-term account growth.`
 
     try {
-      const expansionResult = await subagentService.invokeSubagent({
+      const expansionResult = await invokeSubagentServer({
         agent: 'getty-images-executive',
         task: expansionTask,
         context: `Getty Images account expansion for ${gettyAccount.tier === 1 ? 'Tier 1' : gettyAccount.tier === 2 ? 'Tier 2' : 'Tier 3'} account`,
@@ -387,7 +373,7 @@ Strategy Requirements:
 Focus on driving visual content consumption and revenue growth.`
 
     try {
-      const strategyResult = await subagentService.invokeSubagent({
+      const strategyResult = await invokeSubagentServer({
         agent: 'getty-images-executive',
         task: strategyTask,
         context: `Visual content strategy for ${gettyAccount.industry} industry`,

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { subagentService } from '@/lib/subagents'
+import { listAvailableSubagentSlugs } from '@/lib/subagent-registry'
+import { invokeSubagentServer } from '@/lib/subagent-exec'
 
 export async function GET() {
-  const agents = await subagentService.listAvailableSubagents()
+  const agents = listAvailableSubagentSlugs()
   return NextResponse.json({ agents })
 }
 
@@ -16,11 +17,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ age
       return NextResponse.json({ error: 'Missing required field: task' }, { status: 400 })
     }
 
-    const result = await subagentService.invokeSubagent({ agent, task, context, companyId })
+    const result = await invokeSubagentServer({ agent, task, context, companyId })
     return NextResponse.json(result)
   } catch (error: unknown) {
     console.error('Subagent invoke error:', error)
     return NextResponse.json({ error: (error as Error)?.message || 'Failed to invoke subagent' }, { status: 500 })
   }
 }
-
