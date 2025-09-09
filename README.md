@@ -1,32 +1,74 @@
-# Jarvis CRM - AI-First Sales Command Center
+# CursorJarvis - AI-First CRM with Autonomous Agents
 
-Jarvis is a standalone AI-first CRM + Sales Command Center designed to compress time from lead → meeting → qualified opp → close, while increasing quality touches/hour.
+CursorJarvis is a standalone AI-first CRM that replaces Salesforce/HubSpot integrations with an internal CRM core and multi-agent orchestration layer. It delivers Clay-style enrichment, Gong-style conversation intelligence, Outreach-style sales execution, and Pipefy-style process autonomy.
 
-## 🎯 North Star & Guardrails
+## 🎯 North Star & Value Proposition
 
-**North Star:** Compress time from lead → meeting → qualified opp → close, while increasing quality touches/hour.
+**North Star:** Compress time from lead → meeting → qualified opp → close, while increasing quality touches/hour through AI-first automation.
 
-**4 Optimization Loops:**
-1. Signals → NBAs → Action → Outcome
-2. Prospecting → Conversations → Meetings  
-3. Meeting → Follow-up → Next Step
-4. Brand → Engagement → Meetings
+### 4 Strategic Pillars
 
-**Analyst-first:** Jarvis suggests with clear why + source; you approve/snooze/decline. Unlock autonomy only for proven "Golden Plays."
+1. **Data Intelligence (Clay-style)**: Waterfall enrichment + account research
+2. **Conversation Intelligence (Gong-style)**: Transcript → signals → risk → actions  
+3. **Sales Execution (Outreach-style)**: Multi-channel sequence orchestration
+4. **Process Autonomy (Pipefy-style)**: Goal-oriented SDR/RevOps workflows with guardrails
+
+**Analyst-first Approach:** AI suggests with clear reasoning and sources; humans approve/snooze/decline. Unlock autonomy only for proven "Golden Plays."
+
+## 🤖 AI Agent Architecture
+
+CursorJarvis implements a pluggable multi-agent system that automates CRM workflows:
+
+### Core Components
+- **Agent Registry**: Discovery and registration system for AI agents
+- **Agent Supervisor**: Routing and execution management  
+- **CoreCRM**: Internal data access layer (no external CRM dependencies)
+- **Agent API**: HTTP endpoints for agent execution (`/api/agents/run`)
+
+### Built-in Agents
+
+#### 1. Waterfall Enrichment Agent
+- **Capabilities**: `enrichment.waterfall`, `research.account`
+- **Function**: Clay-style data enrichment using provider waterfall
+- **Features**: Cost tracking, confidence scoring, automatic field updates
+
+#### 2. Conversation Insights Agent  
+- **Capabilities**: `conversation.insights`, `deal.predict`
+- **Function**: Gong-style transcript analysis and deal prediction
+- **Features**: Sentiment analysis, objection detection, risk scoring, follow-up automation
+
+#### 3. Sequence Orchestrator Agent
+- **Capabilities**: `sequence.orchestrate`
+- **Function**: Outreach-style multi-channel sequence automation
+- **Features**: Template management, enrollment tracking, performance analytics
+
+#### 4. Process Autonomy Agent
+- **Capabilities**: `process.autonomy`  
+- **Function**: Pipefy-style workflow automation with guardrails
+- **Features**: Lead qualification, deal health checks, account expansion, renewal prep
+
+### Agent Testing Console
+Access `/agents` to interactively test agents, view execution history, and debug responses.
 
 ## 🏗️ Architecture
 
 ### Tech Stack
-- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
+- **Frontend:** Next.js 15, TypeScript, Tailwind CSS
 - **Backend:** Next.js API Routes, Prisma ORM
-- **Database:** PostgreSQL
-- **AI Integration:** Perplexity Pro API
+- **Database:** PostgreSQL with standalone CRM models
+- **AI Integration:** Multi-agent orchestration system
 - **UI Components:** Radix UI, Lucide React
 
-### Core Modules
+### CRM Data Models
+- **Account, Contact, Lead, Deal**: Core CRM entities
+- **Activity, Transcript, EnrichmentSignal**: Agent-generated data
+- **Sequence, SequenceStep**: Multi-channel automation
+- **AgentAuditLog**: Comprehensive execution tracking
+
+### Legacy Modules (Existing)
 - **NBA Brain:** AI-powered Next Best Actions with scoring system
 - **Perplexity Integration:** Deep research and account intelligence
-- **Brand Studio:** Getty-approved messaging and proof points
+- **Brand Studio:** Getty-approved messaging and proof points  
 - **Meeting OS:** Calendly integration with AI brief generation
 - **Deal OS:** Pipeline management with risk radar and playbooks
 - **Learning Loop:** Weekly digest with Golden Play promotion/retirement
@@ -75,7 +117,63 @@ npx prisma generate
 npm run dev
 ```
 
+6. Access the AI Agent Console
+Navigate to `http://localhost:3000/agents` to test and debug AI agents.
+
+## 🤖 Using AI Agents
+
+### Execute Agents via API
+
+```bash
+# Enrich an account with waterfall providers
+curl -X POST http://localhost:3000/api/agents/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "capability": "enrichment.waterfall",
+    "context": {
+      "recordType": "ACCOUNT", 
+      "recordId": "account_123",
+      "payload": {"maxCost": 100}
+    }
+  }'
+
+# Analyze conversation transcript
+curl -X POST http://localhost:3000/api/agents/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "capability": "conversation.insights",
+    "context": {
+      "recordType": "DEAL",
+      "recordId": "deal_123", 
+      "payload": {
+        "transcript": "Customer conversation...",
+        "source": "zoom"
+      }
+    }
+  }'
+```
+
+### Available Capabilities
+- `enrichment.waterfall`: Clay-style data enrichment
+- `conversation.insights`: Gong-style transcript analysis  
+- `sequence.orchestrate`: Outreach-style sequence automation
+- `process.autonomy`: Pipefy-style workflow automation
+
+See [Agent Architecture docs](docs/ARCHITECTURE-AGENTS.md) for detailed usage.
+
 ## 📊 Features
+
+### AI Agent Automation
+- **Data Intelligence**: Waterfall enrichment with cost optimization and confidence scoring
+- **Conversation Intelligence**: Transcript analysis, sentiment detection, and deal risk prediction
+- **Sales Execution**: Multi-channel sequence automation with performance tracking
+- **Process Autonomy**: Goal-oriented workflows with approval guardrails and SLA management
+
+### Agent Testing Console (`/agents`)
+- Interactive agent execution with real-time results
+- Execution history and performance monitoring
+- Agent discovery and capability mapping
+- JSON payload testing and debugging
 
 ### My Work Dashboard
 - Top 5 Next Best Actions with AI rationale
@@ -190,11 +288,24 @@ The Prisma schema includes models for:
 
 ### API Routes
 - `/api/nbas` - NBA management
-- `/api/leads` - Lead import/export/processing
+- `/api/leads` - Lead import/export/processing  
 - `/api/meetings` - Meeting management and briefs
 - `/api/perplexity` - AI research integration
 - `/api/digest` - Weekly digest generation
 - `/api/rules` - Golden Play promotion/retirement
+- `/api/agents/run` - AI agent execution endpoint
+
+### Agent Architecture
+- Multi-agent orchestration system with registry and supervisor
+- Built-in agents for enrichment, conversation analysis, sequences, and workflows
+- Extensible framework for custom agents and external integrations
+- Comprehensive audit logging and performance monitoring
+
+## 📚 Documentation
+
+- [AI Agent Architecture](docs/ARCHITECTURE-AGENTS.md) - Detailed agent system documentation
+- [CRM Mapping & Improvement Plan](docs/IMPROVEMENT-PLAN-CRM-MAPPING.md) - Strategic roadmap and competitive positioning
+- [Production Deployment Guide](PRODUCTION_DEPLOYMENT_GUIDE.md) - Infrastructure and deployment instructions
 
 ## 📝 License
 
