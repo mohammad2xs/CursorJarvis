@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { autoSubagentOrchestrator } from '@/lib/auto-subagents'
 import { db } from '@/lib/db'
+import { withApi, fail } from '@/lib/api-utils'
 
-export async function POST(req: NextRequest) {
+export const POST = withApi(async (req: NextRequest) => {
   try {
     const { companyId } = await req.json()
 
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (!company) {
-      return NextResponse.json({ error: 'Company not found' }, { status: 404 })
+      return fail('Company not found', 404)
     }
 
     const context = {
@@ -72,15 +73,14 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    return NextResponse.json({
-      success: true,
+    return NextResponse.json({ ok: true, data: {
       results: results.map(r => ({
         trigger: r.trigger,
         agent: r.agent,
         priority: r.priority,
         summary: r.result.substring(0, 200) + '...'
       }))
-    })
+    } })
 
   } catch (error: unknown) {
     console.error('Auto-subagent processing error:', error)
@@ -90,6 +90,6 @@ export async function POST(req: NextRequest) {
       { trigger: 'MARKET_INTEL', agent: 'sales-executive', priority: 6, summary: 'Industry trend: regulatory shift; competitive moves...' },
       { trigger: 'ACCOUNT_EXPANSION', agent: 'getty-images-executive', priority: 9, summary: 'Expansion: target HR/ESG; subsidiaries; 90-day plan...' },
     ]
-    return NextResponse.json({ success: true, results: mock }, { status: 200 })
+    return NextResponse.json({ ok: true, data: { results: mock } }, { status: 200 })
   }
-}
+})

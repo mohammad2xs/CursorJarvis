@@ -437,10 +437,17 @@ export default function AnalyticsPage() {
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Recent Persisted Insights</h2>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" onClick={handleLoadPersistedInsights}>Load Persisted Insights</Button>
+                  <Button variant="outline" onClick={handleLoadPersistedInsights} disabled={!health?.db}>
+                    {health?.db ? 'Load Persisted Insights' : 'DB Not Configured'}
+                  </Button>
                   <span className="text-sm text-gray-500">{persistedInsights.length} items</span>
                 </div>
               </div>
+              {!health?.db && (
+                <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 inline-block mb-3">
+                  Database connection is not configured. Set DATABASE_URL and run migrations to enable persisted insights.
+                </div>
+              )}
               <div className="space-y-3">
                 {persistedInsights.map((i) => (
                   <div key={i.id} className="rounded-md border bg-gray-50 p-3">

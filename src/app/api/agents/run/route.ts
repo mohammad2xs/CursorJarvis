@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { Prisma } from '@prisma/client'
+import { withApi, fail } from '@/lib/api-utils'
 
 type RunPayload = {
   capability: string
@@ -8,20 +9,16 @@ type RunPayload = {
   opportunityId?: string
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withApi(async (req: NextRequest) => {
   const startedAt = Date.now()
   let auditId: string | undefined
   try {
     const body: RunPayload = await req.json().catch(() => ({} as RunPayload))
     const { capability, companyId, opportunityId } = body
 
-    if (!capability) {
-      return NextResponse.json({ error: 'capability is required' }, { status: 400 })
-    }
+    if (!capability) return fail('capability is required', 400)
 
-    if (!companyId && !opportunityId) {
-      return NextResponse.json({ error: 'companyId or opportunityId required' }, { status: 400 })
-    }
+    if (!companyId && !opportunityId) return fail('companyId or opportunityId required', 400)
 
     // Resolve company/opportunity if provided
     const company = companyId
@@ -31,12 +28,8 @@ export async function POST(req: NextRequest) {
       ? await db.opportunity.findUnique({ where: { id: opportunityId } })
       : null
 
-    if (companyId && !company) {
-      return NextResponse.json({ error: 'company not found' }, { status: 404 })
-    }
-    if (opportunityId && !opportunity) {
-      return NextResponse.json({ error: 'opportunity not found' }, { status: 404 })
-    }
+    if (companyId && !company) return fail('company not found', 404)
+    if (opportunityId && !opportunity) return fail('opportunity not found', 404)
 
     // Create initial audit log entry
     const audit = await db.agentAuditLog.create({
@@ -56,7 +49,7 @@ export async function POST(req: NextRequest) {
         where: { id: audit.id },
         data: { status: 'FAILED', output: { error: 'unsupported capability' } },
       })
-      return NextResponse.json({ error: 'unsupported capability', auditId: audit.id }, { status: 400 })
+      return NextResponse.json({ ok: false, error: { message: 'unsupported capability' }, auditId: audit.id }, { status: 400 })
     }
 
     // Synthesize enrichment signals (simple heuristics)
@@ -106,12 +99,7 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    return NextResponse.json({
-      success: true,
-      auditId: audit.id,
-      activityId: activity.id,
-      signals,
-    })
+    return NextResponse.json({ ok: true, data: { auditId: audit.id, activityId: activity.id, signals } })
   } catch (error: unknown) {
     if (auditId) {
       await db.agentAuditLog.update({
@@ -119,6 +107,6 @@ export async function POST(req: NextRequest) {
         data: { status: 'FAILED', output: { error: (error as Error)?.message || 'unknown error' } },
       }).catch(() => {})
     }
-    return NextResponse.json({ error: (error as Error)?.message || 'failed to run agent' }, { status: 500 })
+    return fail((error as Error)?.message || 'failed to run agent', 500)
   }
-}
+})

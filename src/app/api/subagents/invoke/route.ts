@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { invokeSubagentServer } from '@/lib/subagent-exec'
+import { withApi } from '@/lib/api-utils'
 
-export async function POST(request: NextRequest) {
+export const POST = withApi(async (request: NextRequest) => {
   try {
     const params = await request.json()
     const result = await invokeSubagentServer(params)
@@ -12,4 +13,4 @@ export async function POST(request: NextRequest) {
     const result = await invokeSubagentServer(params)
     return NextResponse.json(result)
   }
-}
+})

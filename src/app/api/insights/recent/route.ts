@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { withApi, fail } from '@/lib/api-utils'
 
-export async function GET(req: NextRequest) {
+export const GET = withApi(async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url)
     const companyId = searchParams.get('companyId') || undefined
@@ -23,9 +24,8 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    return NextResponse.json({ insights })
+    return NextResponse.json({ ok: true, data: { insights } })
   } catch (e: unknown) {
-    return NextResponse.json({ error: (e as Error)?.message || 'Failed to load insights' }, { status: 500 })
+    return fail((e as Error)?.message || 'Failed to load insights', 500)
   }
-}
-
+})

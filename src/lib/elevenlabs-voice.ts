@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ElevenLabs } from '@elevenlabs/elevenlabs-js'
 
 export interface VoiceSettings {

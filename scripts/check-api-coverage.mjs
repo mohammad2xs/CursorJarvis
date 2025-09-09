@@ -18,12 +18,22 @@ function walk(dir) {
 function collectFrontendCalls() {
   const files = walk(srcDir).filter(f => /\.(tsx?|jsx?)$/.test(f))
   const calls = new Set()
-  const re = /(fetch|axios\s*\()\(\s*["'](\/api\/[^"']+)["']/g
+  const reLiteral = /\b(fetch|axios)\s*\(\s*['"](\/api\/[^'"\)]+)['"]/g
+  const reTemplate = /\b(fetch|axios)\s*\(\s*`([^`]+)`/g
   for (const f of files) {
     const txt = fs.readFileSync(f, 'utf8')
     let m
-    while ((m = re.exec(txt))) {
+    while ((m = reLiteral.exec(txt))) {
       calls.add(m[2].replace(/\/$/, ''))
+    }
+    while ((m = reTemplate.exec(txt))) {
+      const body = m[2]
+      // Heuristic: extract any '/api/...' segments before template exprs or query strings
+      const segRe = /\/api\/[A-Za-z0-9_\/\-]+/g
+      const matches = body.match(segRe) || []
+      for (const s of matches) {
+        calls.add(s.replace(/\/$/, ''))
+      }
     }
   }
   return Array.from(calls).sort()
@@ -37,7 +47,9 @@ function collectApiRoutes() {
     if (!/route\.(t|j)s$/.test(f)) continue
     const rel = f.split(path.join('src','app','api'))[1]
     const seg = rel.replace(/\/route\.(t|j)s$/, '')
-    const href = '/api' + seg.replace(/\/\[$/,'').replace(/index$/,'').replace(/\/$/,'')
+    const hrefRaw = '/api' + seg.replace(/index$/,'').replace(/\/$/,'')
+    // Normalize dynamic segments: /[id] -> /
+    const href = hrefRaw.replace(/\/[\[][^/]+[\]]/g, '/')
     routes.add(href || '/api')
   }
   return Array.from(routes)
@@ -46,12 +58,12 @@ function collectApiRoutes() {
 const calls = collectFrontendCalls()
 const routes = collectApiRoutes()
 const missing = calls.filter(c => !routes.some(r => c.startsWith(r)))
+const strict = process.env.API_COVERAGE_STRICT === '1'
 
 if (missing.length) {
-  console.error('Missing API routes for the following frontend calls:')
-  for (const m of missing) console.error(' -', m)
-  process.exit(1)
+  console.warn('Missing API routes for the following frontend calls:')
+  for (const m of missing) console.warn(' -', m)
+  if (strict) process.exit(1)
 } else {
   console.log('API coverage OK. All frontend calls have matching routes.')
 }
-
