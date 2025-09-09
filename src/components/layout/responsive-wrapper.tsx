@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { MobileDashboard } from './mobile-dashboard'
 import { Sidebar } from './sidebar'
 import { Header } from './header'
@@ -32,11 +33,20 @@ interface ResponsiveWrapperProps {
 }
 
 export function ResponsiveWrapper({ userId }: ResponsiveWrapperProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [isMobile, setIsMobile] = useState(false)
   const [nbas, setNbas] = useState<NBA[]>([])
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState<VoiceNotification[]>([])
-  const [activeTab, setActiveTab] = useState('daily-planning')
+  const validTabs = [
+    'daily-planning','email-dashboard','my-work','analytics','zapier','notifications','meetings',
+    'behavioral-learning','performance-coaching','dynamic-content','competitive-intelligence',
+    'team-collaboration','client-communication','social-selling','performance-analytics'
+  ] as const
+  type TabValue = typeof validTabs[number]
+  const [activeTab, setActiveTab] = useState<TabValue>('daily-planning')
 
   // Check if screen is mobile
   useEffect(() => {
@@ -102,6 +112,15 @@ export function ResponsiveWrapper({ userId }: ResponsiveWrapperProps) {
     setLoading(false)
   }, [])
 
+  // Read initial tab from URL (?tab=)
+  useEffect(() => {
+    const tab = searchParams.get('tab') as TabValue | null
+    if (tab && validTabs.includes(tab)) {
+      setActiveTab(tab)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleUpdateNBA = (nbaId: string, status: NBAStatus, outcome?: string) => {
     setNbas(prev => prev.map(nba => 
       nba.id === nbaId ? { ...nba, status } : nba
@@ -110,7 +129,12 @@ export function ResponsiveWrapper({ userId }: ResponsiveWrapperProps) {
 
   // Voice command handlers
   const handleVoiceNavigate = (tab: string) => {
-    setActiveTab(tab)
+    if (validTabs.includes(tab as TabValue)) {
+      setActiveTab(tab as TabValue)
+      const params = new URLSearchParams(searchParams?.toString() || '')
+      params.set('tab', tab)
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    }
   }
 
   const handleVoiceRefresh = () => {
@@ -184,8 +208,18 @@ export function ResponsiveWrapper({ userId }: ResponsiveWrapperProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header userId={userId} />
           <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                     <TabsList className="flex w-full gap-2 overflow-x-auto bg-white/60 backdrop-blur supports-backdrop-blur:bg-white/40 border rounded-lg p-1">
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) => {
+                const v = value as TabValue
+                setActiveTab(v)
+                const params = new URLSearchParams(searchParams?.toString() || '')
+                params.set('tab', v)
+                router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+              }}
+              className="space-y-4"
+            >
+                     <TabsList className="sticky top-0 z-10 flex w-full gap-2 overflow-x-auto bg-white/80 backdrop-blur supports-backdrop-blur:bg-white/60 border rounded-xl p-1 shadow-sm">
                        <TabsTrigger value="daily-planning">Daily Planning</TabsTrigger>
                        <TabsTrigger value="email-dashboard">Email Dashboard</TabsTrigger>
                        <TabsTrigger value="my-work">My Work</TabsTrigger>
