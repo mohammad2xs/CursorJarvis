@@ -1,0 +1,40 @@
+name: Draft Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name (e.g., v0.2.0)'
+        required: true
+        default: 'v0.2.0'
+      target:
+        description: 'Target commitish (branch or SHA)'
+        required: true
+        default: 'main'
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract release notes from CHANGELOG
+        id: notes
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          awk -v tag="$TAG" 'BEGIN{p=0} $0 ~ "^## " tag {p=1; print; next} /^## / && p==1 {p=0} p==1 {print}' CHANGELOG.md > RELEASE_NOTES.md
+          echo "---- RELEASE NOTES ----"
+          cat RELEASE_NOTES.md
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.tag }}
+          draft: true
+          body_path: RELEASE_NOTES.md
+          target_commitish: ${{ github.event.inputs.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
