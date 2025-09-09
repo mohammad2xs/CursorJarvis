@@ -83,6 +83,8 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string>('')
   const [autoInsights, setAutoInsights] = useState<Record<string, unknown>[]>([])
   const [loadingAuto, setLoadingAuto] = useState<boolean>(false)
+  const [seededCompanies, setSeededCompanies] = useState<Array<{ id: string; name: string; createdAt: string }>>([])
+  const [loadingSeeds, setLoadingSeeds] = useState<boolean>(false)
 
   useEffect(() => {
     const load = async () => {
@@ -174,6 +176,44 @@ export default function AnalyticsPage() {
     }
   }
 
+  const handleLoadSeededCompanies = async () => {
+    setLoadingSeeds(true)
+    setError('')
+    try {
+      const res = await fetch('/api/dev/seeded-companies')
+      const data = await res.json()
+      const list = Array.isArray(data?.companies) ? data.companies : []
+      setSeededCompanies(list)
+      if (list.length === 0) {
+        toast('No test companies found', { description: 'Click "Create Test Company" to seed one.' })
+      } else {
+        toast.success('Loaded test companies', { description: `${list.length} found` })
+      }
+    } catch (e: unknown) {
+      const msg = (e as Error)?.message || 'Failed to load test companies'
+      setError(msg)
+      toast.error('Error', { description: msg })
+    } finally {
+      setLoadingSeeds(false)
+    }
+  }
+
+  const handleCleanTestData = async () => {
+    setError('')
+    try {
+      const res = await fetch('/api/dev/clean-test-data', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Failed to clean test data')
+      setSeededCompanies([])
+      setCompanyId('')
+      toast.success('Test data removed', { description: `${data?.deletedCount || 0} companies deleted` })
+    } catch (e: unknown) {
+      const msg = (e as Error)?.message || 'Failed to clean test data'
+      setError(msg)
+      toast.error('Error', { description: msg })
+    }
+  }
+
   const handleRetireRule = async (playType: string, segment: string) => {
     try {
       const response = await fetch('/api/rules/retire', {
@@ -220,9 +260,23 @@ export default function AnalyticsPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium">Company ID (optional)</label>
-                  <div className="flex items-center gap-2">
-                    <Input value={companyId} onChange={(e) => setCompanyId(e.target.value)} placeholder="company id" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Input value={companyId} onChange={(e) => setCompanyId(e.target.value)} placeholder="company id" className="w-[220px]" />
+                    <Select onValueChange={(v) => setCompanyId(v)}>
+                      <SelectTrigger className="w-[220px]"><SelectValue placeholder="Select Test Company" /></SelectTrigger>
+                      <SelectContent>
+                        {seededCompanies.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="outline" onClick={handleLoadSeededCompanies} disabled={loadingSeeds}>
+                      {loadingSeeds ? 'Loading…' : 'Load Test Companies'}
+                    </Button>
                     <Button type="button" variant="outline" onClick={handleCreateTestCompany}>Create Test Company</Button>
+                    <Button type="button" variant="destructive" onClick={handleCleanTestData}>Clean Test Data</Button>
                   </div>
                 </div>
               </div>

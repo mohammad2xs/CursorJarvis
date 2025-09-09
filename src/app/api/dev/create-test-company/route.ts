@@ -15,7 +15,7 @@ export async function POST() {
         website: 'https://www.example.com',
         subIndustry: 'Aerospace & Defense',
         region: 'North America',
-        tags: ['ESG', 'Safety', 'Innovation'],
+        tags: ['ESG', 'Safety', 'Innovation', 'TEST_SEED'],
         contacts: {
           create: [
             {
@@ -69,4 +69,3 @@ export async function POST() {
     )
   }
 }
-
