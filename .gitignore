@@ -42,3 +42,5 @@ next-env.d.ts
 
 /src/generated/prisma
 bmad-method/
+.fastembed_cache/
+.codanna/
