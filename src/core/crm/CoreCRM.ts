@@ -152,8 +152,8 @@ export class CoreCRM {
       const accounts = await this.prisma.account.findMany({
         where: {
           OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { domain: { contains: query, mode: 'insensitive' } },
+            { name: { contains: query } },
+            { domain: { contains: query } },
           ],
         },
         take: limit,
@@ -164,10 +164,10 @@ export class CoreCRM {
       const contacts = await this.prisma.crmContact.findMany({
         where: {
           OR: [
-            { firstName: { contains: query, mode: 'insensitive' } },
-            { lastName: { contains: query, mode: 'insensitive' } },
-            { email: { contains: query, mode: 'insensitive' } },
-            { title: { contains: query, mode: 'insensitive' } },
+            { firstName: { contains: query } },
+            { lastName: { contains: query } },
+            { email: { contains: query } },
+            { title: { contains: query } },
           ],
         },
         include: { account: true },
@@ -179,10 +179,10 @@ export class CoreCRM {
       const leads = await this.prisma.lead.findMany({
         where: {
           OR: [
-            { firstName: { contains: query, mode: 'insensitive' } },
-            { lastName: { contains: query, mode: 'insensitive' } },
-            { email: { contains: query, mode: 'insensitive' } },
-            { company: { contains: query, mode: 'insensitive' } },
+            { firstName: { contains: query } },
+            { lastName: { contains: query } },
+            { email: { contains: query } },
+            { company: { contains: query } },
           ],
         },
         take: limit,
@@ -193,8 +193,8 @@ export class CoreCRM {
       const deals = await this.prisma.deal.findMany({
         where: {
           OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { nextStep: { contains: query, mode: 'insensitive' } },
+            { name: { contains: query } },
+            { nextStep: { contains: query } },
           ],
         },
         include: { account: true, contact: true },

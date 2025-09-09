@@ -64,7 +64,7 @@ class ProcessAutonomyAgent extends BaseAgent {
 
     } catch (error) {
       console.error('Error in process autonomy:', error);
-      return this.createErrorResult(error, { duration: Date.now() - startTime });
+      return this.createErrorResult(error instanceof Error ? error : new Error('Unknown error'), { duration: Date.now() - startTime });
     }
   }
 
@@ -178,17 +178,17 @@ class ProcessAutonomyAgent extends BaseAgent {
       };
 
     } catch (error) {
-      console.error('Workflow execution failed:', error);
+      console.log('Workflow execution failed:', error);
       stepResults.push({
         step: 'error',
         status: 'failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : 'Unknown error' },
       });
 
       return {
         workflow,
         leadId,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         stepsExecuted: stepResults,
         telemetry: this.generateTelemetry(stepResults),
       };

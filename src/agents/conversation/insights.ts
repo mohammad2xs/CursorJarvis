@@ -120,7 +120,7 @@ class ConversationInsightsAgent extends BaseAgent {
 
     } catch (error) {
       console.error('Error in conversation analysis:', error);
-      return this.createErrorResult(error, { duration: Date.now() - startTime });
+      return this.createErrorResult(error instanceof Error ? error : new Error('Unknown error'), { duration: Date.now() - startTime });
     }
   }
 

@@ -51,7 +51,7 @@ class SequenceOrchestratorAgent extends BaseAgent {
 
     } catch (error) {
       console.error('Error in sequence orchestration:', error);
-      return this.createErrorResult(error, { duration: Date.now() - startTime });
+      return this.createErrorResult(error instanceof Error ? error : new Error('Unknown error'), { duration: Date.now() - startTime });
     }
   }
 
