@@ -263,6 +263,39 @@ model RevenueAttribution {
   @@map("revenue_attribution")
 }
 
+model AgentAuditLog {
+  id            String      @id @default(cuid())
+  capability    String
+  input         Json?
+  output        Json?
+  status        String      // SUCCESS | FAILED
+  companyId     String?
+  opportunityId String?
+  createdAt     DateTime    @default(now())
+
+  company       Company?    @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  opportunity   Opportunity?@relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+
+  @@map("agent_audit_logs")
+}
+
+model EnrichmentSignal {
+  id            String      @id @default(cuid())
+  type          String
+  title         String
+  details       String?
+  confidence    Int?
+  source        String      // subsystem or upstream component
+  companyId     String
+  opportunityId String?
+  createdAt     DateTime    @default(now())
+
+  company       Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity?@relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+
+  @@map("enrichment_signals")
+}
+
 // Enums
 enum PriorityLevel {
   STRATEGIC
