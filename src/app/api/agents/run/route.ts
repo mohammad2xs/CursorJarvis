@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { Prisma } from '@prisma/client'
 
 type RunPayload = {
   capability: string
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
     const audit = await db.agentAuditLog.create({
       data: {
         capability,
-        input: body as unknown as Record<string, unknown>,
+        input: body as unknown as Prisma.InputJsonValue,
         status: 'RUNNING',
         companyId: company?.id,
         opportunityId: opportunity?.id,
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Synthesize enrichment signals (simple heuristics)
-    const signals = [] as Array<{ id: string; title: string; type: string; confidence?: number }>
+    const signals = [] as Array<{ id: string; title: string; type: string; confidence: number | null }>
     const synthesized = [
       { type: 'persona', title: 'Executive persona detected: CMO', confidence: 90 },
       { type: 'timing', title: 'Upcoming meeting within 24 hours', confidence: 80 },
@@ -101,7 +102,7 @@ export async function POST(req: NextRequest) {
         output: {
           generatedSignals: signals.length,
           activityId: activity.id,
-        } as unknown as Record<string, unknown>,
+        } as unknown as Prisma.InputJsonValue,
       },
     })
 

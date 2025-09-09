@@ -31,6 +31,8 @@ model Company {
   notes             Note[]
   nbas              NBA[]
   revenueAttribution RevenueAttribution[]
+  agentAuditLogs    AgentAuditLog[]    @relation(name: "CompanyAgentAuditLogs")
+  enrichmentSignals EnrichmentSignal[] @relation(name: "CompanyEnrichmentSignals")
   
   @@map("companies")
 }
@@ -57,6 +59,7 @@ model Contact {
   nbas              NBA[]
   revenueAttribution RevenueAttribution[]
   
+  
   @@map("contacts")
 }
 
@@ -80,6 +83,8 @@ model Opportunity {
   notes             Note[]
   nbas              NBA[]
   revenueAttribution RevenueAttribution[]
+  agentAuditLogs    AgentAuditLog[]    @relation(name: "OpportunityAgentAuditLogs")
+  enrichmentSignals EnrichmentSignal[] @relation(name: "OpportunityEnrichmentSignals")
   
   @@map("opportunities")
 }
@@ -273,8 +278,8 @@ model AgentAuditLog {
   opportunityId String?
   createdAt     DateTime    @default(now())
 
-  company       Company?    @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  opportunity   Opportunity?@relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  company       Company?    @relation(name: "CompanyAgentAuditLogs", fields: [companyId], references: [id], onDelete: SetNull)
+  opportunity   Opportunity?@relation(name: "OpportunityAgentAuditLogs", fields: [opportunityId], references: [id], onDelete: SetNull)
 
   @@map("agent_audit_logs")
 }
@@ -290,8 +295,8 @@ model EnrichmentSignal {
   opportunityId String?
   createdAt     DateTime    @default(now())
 
-  company       Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  opportunity   Opportunity?@relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  company       Company     @relation(name: "CompanyEnrichmentSignals", fields: [companyId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity?@relation(name: "OpportunityEnrichmentSignals", fields: [opportunityId], references: [id], onDelete: SetNull)
 
   @@map("enrichment_signals")
 }

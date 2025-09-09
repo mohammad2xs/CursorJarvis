@@ -86,6 +86,8 @@ export default function AnalyticsPage() {
   const [seededCompanies, setSeededCompanies] = useState<Array<{ id: string; name: string; createdAt: string }>>([])
   const [loadingSeeds, setLoadingSeeds] = useState<boolean>(false)
   const [persistedInsights, setPersistedInsights] = useState<Array<{ id: string; title: string; summary: string; source: string; detectedAt: string; tags: string[] }>>([])
+  const [health, setHealth] = useState<{ ok: boolean; version: string; db: boolean; envs: Record<string, boolean> } | null>(null)
+  const [healthLoading, setHealthLoading] = useState<boolean>(false)
 
   useEffect(() => {
     const load = async () => {
@@ -98,6 +100,18 @@ export default function AnalyticsPage() {
       }
     }
     load()
+    // Load health on mount
+    ;(async () => {
+      try {
+        setHealthLoading(true)
+        const h = await fetch('/api/health').then(r => r.json())
+        setHealth(h)
+      } catch {
+        setHealth({ ok: false, version: '', db: false, envs: {} })
+      } finally {
+        setHealthLoading(false)
+      }
+    })()
   }, [])
 
   const handleRun = async () => {
@@ -256,12 +270,75 @@ export default function AnalyticsPage() {
     }
   }
 
+  const handleRefreshHealth = async () => {
+    try {
+      setHealthLoading(true)
+      const h = await fetch('/api/health').then(r => r.json())
+      setHealth(h)
+      toast.success('Health refreshed')
+    } catch (e: unknown) {
+      const msg = (e as Error)?.message || 'Failed to refresh health'
+      setError(msg)
+      toast.error('Error', { description: msg })
+    } finally {
+      setHealthLoading(false)
+    }
+  }
+
   return (
     <div className="flex h-screen">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+          {/* Dev Tools */}
+          <div className="mb-6 grid grid-cols-1 gap-4">
+            <div className="rounded-lg border bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Dev Tools</h2>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={handleRefreshHealth} disabled={healthLoading}>
+                    {healthLoading ? 'Refreshing…' : 'Refresh Health'}
+                  </Button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <div className="text-sm font-medium mb-1">Health</div>
+                  <div className="text-sm text-gray-700">
+                    <div>Status: {health?.ok && health?.db ? 'OK' : 'Degraded'}</div>
+                    <div>DB: {health?.db ? 'OK' : 'Unavailable'}</div>
+                    <div>Version: {health?.version || '-'}</div>
+                    {health && (
+                      <div className="mt-1 text-xs text-gray-500">
+                        Missing envs: {Object.entries(health.envs || {}).filter(([,v]) => !v).map(([k]) => k).join(', ') || 'none'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-1">Seed & Data</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button type="button" variant="outline" onClick={handleLoadSeededCompanies} disabled={loadingSeeds}>
+                      {loadingSeeds ? 'Loading…' : 'Load Test Companies'}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={handleCreateTestCompany}>Create Test Company</Button>
+                    <Button type="button" variant="destructive" onClick={handleCleanTestData}>Clean Test Data</Button>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-1">Quick Links</div>
+                  <div className="text-sm text-blue-700 underline space-x-3">
+                    <a href="/ui-demo">UI Demo</a>
+                    <a href="/ui-advanced-demo">Advanced UI</a>
+                    <a href="/reports">Reports</a>
+                    <a href="/settings">Settings</a>
+                    <a href="/api/health" target="_blank" rel="noreferrer">/api/health</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="mb-6 grid grid-cols-1 gap-4">
             <div className="rounded-lg border bg-white p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between">
