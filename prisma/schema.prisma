@@ -357,3 +357,268 @@ enum NBAStatus {
   DECLINED
   COMPLETED
 }
+
+// New CRM Models for AI-First CRM
+model Account {
+  id                String   @id @default(cuid())
+  name              String
+  domain            String?
+  techStack         String[] // Array of technologies used
+  employeesBand     String?  // e.g., "1-10", "11-50", "51-200", etc.
+  hqCountry         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  contacts          CrmContact[]
+  deals             Deal[]
+  activities        CrmActivity[]
+  transcripts       Transcript[]
+  enrichmentSignals EnrichmentSignal[]
+  sequenceEnrollments SequenceEnrollment[]
+  agentAuditLogs    AgentAuditLog[]
+  
+  @@map("accounts")
+}
+
+model CrmContact {
+  id                String   @id @default(cuid())
+  accountId         String
+  firstName         String
+  lastName          String
+  title             String?
+  email             String?
+  phone             String?
+  ownerId           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  account           Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  deals             Deal[]
+  activities        CrmActivity[]
+  transcripts       Transcript[]
+  enrichmentSignals EnrichmentSignal[]
+  sequenceEnrollments SequenceEnrollment[]
+  agentAuditLogs    AgentAuditLog[]
+  
+  @@map("crm_contacts")
+}
+
+model Lead {
+  id                String   @id @default(cuid())
+  firstName         String
+  lastName          String
+  company           String?
+  email             String?
+  phone             String?
+  status            LeadStatus @default(NEW)
+  ownerId           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  activities        CrmActivity[]
+  transcripts       Transcript[]
+  enrichmentSignals EnrichmentSignal[]
+  sequenceEnrollments SequenceEnrollment[]
+  agentAuditLogs    AgentAuditLog[]
+  
+  @@map("leads")
+}
+
+model Deal {
+  id                String   @id @default(cuid())
+  accountId         String?
+  contactId         String?
+  name              String
+  stage             DealStage @default(DISCOVERY)
+  amount            Float?
+  closeDate         DateTime?
+  nextStep          String?
+  riskScore         Float?   // 0.0 to 1.0, higher is riskier
+  ownerId           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  account           Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contact           CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  activities        CrmActivity[]
+  transcripts       Transcript[]
+  enrichmentSignals EnrichmentSignal[]
+  agentAuditLogs    AgentAuditLog[]
+  
+  @@map("deals")
+}
+
+model CrmActivity {
+  id                String   @id @default(cuid())
+  recordType        RecordType
+  recordId          String
+  type              CrmActivityType
+  subject           String
+  body              String?
+  dueDate           DateTime?
+  createdBy         String?
+  createdAt         DateTime @default(now())
+  
+  // Relations - polymorphic based on recordType/recordId
+  account           Account? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  contact           CrmContact? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  lead              Lead? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  deal              Deal? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  
+  @@map("crm_activities")
+}
+
+model Transcript {
+  id                String   @id @default(cuid())
+  recordType        RecordType
+  recordId          String
+  source            String   // e.g., "zoom", "gong", "manual"
+  text              String   @db.Text
+  createdAt         DateTime @default(now())
+  
+  // Relations - polymorphic based on recordType/recordId
+  account           Account? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  contact           CrmContact? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  lead              Lead? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  deal              Deal? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  
+  @@map("transcripts")
+}
+
+model EnrichmentSignal {
+  id                String   @id @default(cuid())
+  recordType        RecordType
+  recordId          String
+  key               String   // e.g., "technographics", "employee_count", "recent_funding"
+  value             String   @db.Text
+  confidence        Float    // 0.0 to 1.0
+  createdAt         DateTime @default(now())
+  
+  // Relations - polymorphic based on recordType/recordId
+  account           Account? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  contact           CrmContact? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  lead              Lead? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  deal              Deal? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  
+  @@map("enrichment_signals")
+}
+
+model Sequence {
+  id                String   @id @default(cuid())
+  name              String
+  profile           String   // Target profile description
+  createdBy         String?
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  steps             SequenceStep[]
+  enrollments       SequenceEnrollment[]
+  
+  @@map("sequences")
+}
+
+model SequenceStep {
+  id                String   @id @default(cuid())
+  sequenceId        String
+  dayOffset         Int      // Days from sequence start
+  channel           SequenceChannel
+  templateKey       String   // Reference to template/script
+  scriptKey         String?  // Optional script reference
+  
+  // Relations
+  sequence          Sequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  
+  @@map("sequence_steps")
+}
+
+model SequenceEnrollment {
+  id                String   @id @default(cuid())
+  sequenceId        String
+  recordType        RecordType
+  recordId          String
+  status            EnrollmentStatus @default(ACTIVE)
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  
+  // Relations
+  sequence          Sequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  account           Account? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  contact           CrmContact? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  lead              Lead? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  
+  @@map("sequence_enrollments")
+}
+
+model AgentAuditLog {
+  id                String   @id @default(cuid())
+  agentId           String   // Agent identifier
+  capability        String   // Capability name (e.g., "enrichment.waterfall")
+  recordType        RecordType?
+  recordId          String?
+  userId            String?
+  orgId             String?
+  payloadJson       String   @db.Text  // Input parameters
+  resultJson        String   @db.Text  // Agent output
+  createdAt         DateTime @default(now())
+  
+  // Relations - polymorphic based on recordType/recordId
+  account           Account? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+  contact           CrmContact? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+  lead              Lead? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+  deal              Deal? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+  
+  @@map("agent_audit_logs")
+}
+
+// New Enums for CRM
+enum RecordType {
+  ACCOUNT
+  CONTACT
+  LEAD
+  DEAL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  DISQUALIFIED
+}
+
+enum DealStage {
+  DISCOVERY
+  QUALIFICATION
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum CrmActivityType {
+  CALL
+  EMAIL
+  MEETING
+  TASK
+  NOTE
+  FOLLOW_UP
+  RESEARCH
+}
+
+enum SequenceChannel {
+  EMAIL
+  PHONE
+  LINKEDIN
+  TWITTER
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
