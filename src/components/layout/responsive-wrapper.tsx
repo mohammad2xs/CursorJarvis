@@ -185,7 +185,7 @@ export function ResponsiveWrapper({ userId }: ResponsiveWrapperProps) {
           <Header userId={userId} />
           <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                     <TabsList className="grid w-full grid-cols-15">
+                     <TabsList className="flex w-full gap-2 overflow-x-auto bg-white/60 backdrop-blur supports-backdrop-blur:bg-white/40 border rounded-lg p-1">
                        <TabsTrigger value="daily-planning">Daily Planning</TabsTrigger>
                        <TabsTrigger value="email-dashboard">Email Dashboard</TabsTrigger>
                        <TabsTrigger value="my-work">My Work</TabsTrigger>
