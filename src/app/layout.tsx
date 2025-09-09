@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HealthBanner } from "@/components/health-banner";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <HealthBanner />
         <ThemeToggle />
         <Toaster richColors closeButton />
         <QueryProvider>{children}</QueryProvider>

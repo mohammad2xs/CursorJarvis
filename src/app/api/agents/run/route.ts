@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
           title: s.title,
           confidence: s.confidence,
           source: 'enrichment.waterfall',
-          companyId: company?.id || (opportunity as any)?.companyId,
+          companyId: company?.id || opportunity?.companyId || '',
           opportunityId: opportunity?.id || null,
         },
         select: { id: true, title: true, type: true, confidence: true },
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
         type: 'RESEARCH',
         title: 'Enrichment waterfall executed',
         description: `Generated ${signals.length} signals in ${Date.now() - startedAt}ms`,
-        companyId: company?.id || (opportunity as any)?.companyId,
+        companyId: company?.id || opportunity?.companyId || '',
         opportunityId: opportunity?.id || null,
       },
       select: { id: true },
@@ -121,4 +121,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: (error as Error)?.message || 'failed to run agent' }, { status: 500 })
   }
 }
-

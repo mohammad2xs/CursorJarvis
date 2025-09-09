@@ -85,6 +85,7 @@ export default function AnalyticsPage() {
   const [loadingAuto, setLoadingAuto] = useState<boolean>(false)
   const [seededCompanies, setSeededCompanies] = useState<Array<{ id: string; name: string; createdAt: string }>>([])
   const [loadingSeeds, setLoadingSeeds] = useState<boolean>(false)
+  const [persistedInsights, setPersistedInsights] = useState<Array<{ id: string; title: string; summary: string; source: string; detectedAt: string; tags: string[] }>>([])
 
   useEffect(() => {
     const load = async () => {
@@ -130,6 +131,11 @@ export default function AnalyticsPage() {
       const data = await res.json()
       if (res.ok) {
         setAutoInsights(data.results || [])
+        // after run, attempt to fetch persisted signals
+        try {
+          const pi = await fetch(`/api/insights/recent?companyId=${encodeURIComponent(companyId)}`).then(r => r.json())
+          if (Array.isArray(pi?.insights)) setPersistedInsights(pi.insights)
+        } catch {}
       } else {
         setError(data.error || 'Failed to run auto-subagents')
       }
@@ -209,6 +215,23 @@ export default function AnalyticsPage() {
       toast.success('Test data removed', { description: `${data?.deletedCount || 0} companies deleted` })
     } catch (e: unknown) {
       const msg = (e as Error)?.message || 'Failed to clean test data'
+      setError(msg)
+      toast.error('Error', { description: msg })
+    }
+  }
+
+  const handleLoadPersistedInsights = async () => {
+    if (!companyId) {
+      setError('Please enter a Company ID to load insights')
+      return
+    }
+    setError('')
+    try {
+      const pi = await fetch(`/api/insights/recent?companyId=${encodeURIComponent(companyId)}`).then(r => r.json())
+      if (Array.isArray(pi?.insights)) setPersistedInsights(pi.insights)
+      toast.success('Loaded persisted insights', { description: `${pi?.insights?.length || 0} found` })
+    } catch (e: unknown) {
+      const msg = (e as Error)?.message || 'Failed to load insights'
       setError(msg)
       toast.error('Error', { description: msg })
     }
@@ -331,6 +354,33 @@ export default function AnalyticsPage() {
               </div>
             </div>
           )}
+
+          <div className="mb-6">
+            <div className="rounded-lg border bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Recent Persisted Insights</h2>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={handleLoadPersistedInsights}>Load Persisted Insights</Button>
+                  <span className="text-sm text-gray-500">{persistedInsights.length} items</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {persistedInsights.map((i) => (
+                  <div key={i.id} className="rounded-md border bg-gray-50 p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">{i.title}</div>
+                      <div className="text-xs text-gray-500">{new Date(i.detectedAt).toLocaleString()}</div>
+                    </div>
+                    <p className="text-sm text-gray-700 mt-1">{i.summary}</p>
+                    <div className="text-xs text-gray-500 mt-1">Source: {i.source} &middot; Tags: {i.tags?.join(', ')}</div>
+                  </div>
+                ))}
+                {persistedInsights.length === 0 && (
+                  <div className="text-sm text-gray-500">No insights yet. Run Auto‑Subagents or load after seeding.</div>
+                )}
+              </div>
+            </div>
+          </div>
           <WeeklyDigestComponent 
             digest={digest}
             onPromoteRule={handlePromoteRule}
