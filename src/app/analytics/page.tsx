@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { WeeklyDigestComponent } from '@/components/dashboard/weekly-digest'
+import { toast } from 'sonner'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { WeeklyDigest } from '@/types'
@@ -137,6 +138,23 @@ export default function AnalyticsPage() {
     }
   }
 
+  const handleCreateTestCompany = async () => {
+    setError('')
+    try {
+      const res = await fetch('/api/dev/create-test-company', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok || !data?.company?.id) {
+        throw new Error(data?.error || 'Failed to create test company')
+      }
+      setCompanyId(String(data.company.id))
+      toast.success('Test company created', { description: `Company ID set to ${data.company.id}` })
+    } catch (e: unknown) {
+      const msg = (e as Error)?.message || 'Failed to create test company'
+      setError(msg)
+      toast.error('Error', { description: msg })
+    }
+  }
+
   const handlePromoteRule = async (playType: string, segment: string) => {
     try {
       const response = await fetch('/api/rules/promote', {
@@ -202,7 +220,10 @@ export default function AnalyticsPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium">Company ID (optional)</label>
-                  <Input value={companyId} onChange={(e) => setCompanyId(e.target.value)} placeholder="company id" />
+                  <div className="flex items-center gap-2">
+                    <Input value={companyId} onChange={(e) => setCompanyId(e.target.value)} placeholder="company id" />
+                    <Button type="button" variant="outline" onClick={handleCreateTestCompany}>Create Test Company</Button>
+                  </div>
                 </div>
               </div>
               <div className="mt-3">
